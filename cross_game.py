@@ -7,723 +7,272 @@ The game is played on a grid of cells, where each cell can be in one of four sta
 3 - blue: Used to mark wave from cross edges to the center
 """
 
+import time
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib.widgets import Button
 from matplotlib.colors import ListedColormap
+from Rules import Rules, get_neighberhood
+
+def track_changes(func):
+    """
+    A decorator to track the changes in the grid after calling a function
+    """
+    def wrapper(self, *args, **kwargs):
+        # Store a copy of the grid before changes
+        grid_before = np.copy(self.grid)
+        # Call the original function
+        result = func(self, *args, **kwargs)
+        # Find the indices where the grid has changed
+        changed_indices = np.where(grid_before != self.grid)
+        new_values = self.grid[changed_indices]
+        # Store the changed indices
+        self.changed_indices = list(
+            zip(new_values, changed_indices[0], changed_indices[1])
+        )
+        return result
+
+    return wrapper
 
 
 class GameOfLife:
+    """
+    A class to represent the custom game of life
+    """
     def __init__(self, grid_size):
-        # TODO: Maybe change the implementation to use bits instead of integers
-        # This will allow to use the same grid for both current and next day:
-        # for example we can set the first 2 bits to be the current state-
-        # and the next 2 bits to be the next state up to 4 states on the same cell.
-        # we can use bitwise operations to get the current state and the next state-
-        # or keep the bits and use bitwise for redo/undo
         self.grid_size = grid_size
-        self.grid = self.create_grid(grid_size)
+        self.grid = np.zeros(grid_size, dtype=np.int8)
+        self.changed_indices = []
+        self.create_grid(grid_size)
         self.fig, self.ax = plt.subplots()
+        self.init_grid()
         plt.subplots_adjust(bottom=0.2)
         self.cmap = ListedColormap(
-            ['white', 'black', 'red', 'blue', 'green'], N=5)
+            ["white", "black", "red", "blue", "green"], N=5)
         self.img = self.ax.imshow(
-            self.grid, cmap=self.cmap, interpolation='nearest')
-        self.ax.set_title('My Cross Game of Life')
+            self.grid, cmap=self.cmap, interpolation="nearest")
+        self.ax.set_title("My Cross Game of Life")
         self.ax.set_axis_off()
-        self.setup_button()
-        self.setup_reset_button()
+        self.setup_buttons()
 
-    def draw_random_cross(self, grid, size):
-        # cross is equal arms, in this context a + shape
-        cross_size = np.random.randint(3, 10)
-        cross_middle = np.random.randint(
-            0, size[0] - cross_size), np.random.randint(0, size[1] - cross_size)
-        while cross_middle[0] + cross_size > size[0] or cross_middle[1] + cross_size > size[1]:
-            cross_middle = np.random.randint(
-                0, size[0] - cross_size), np.random.randint(0, size[1] - cross_size)
+    # ========================================================================+
+    # setup grid
 
-        for i in range(cross_size):
-            grid[cross_middle[0] + i, cross_middle[1] + cross_size // 2] = 1
-            grid[cross_middle[0] + cross_size // 2, cross_middle[1] + i] = 1
-
+    @track_changes
     def create_grid(self, size):
-        # draw some cross patterns
+        """
+        Create a grid with random cells and cross patterns
+        """
+
+        # seed the random number generator
+        np.random.seed(int(time.time()))
+
+        def draw_random_cross(grid, size):
+            """
+            select a random cross pattern and place it in a random valid position
+            """
+
+            # cross is equal arms, in this context a + shape
+            cross_size = np.random.randint(3, self.grid_size[0] // 2)
+            cross_middle = np.random.randint(0, size[0] - cross_size), np.random.randint(
+                0, size[1] - cross_size
+            )
+            while (
+                cross_middle[0] + cross_size > size[0]
+                or cross_middle[1] + cross_size > size[1]
+            ):
+                cross_middle = np.random.randint(
+                    0, size[0] - cross_size
+                ), np.random.randint(0, size[1] - cross_size)
+
+            for i in range(cross_size):
+                grid[cross_middle[0] + i, cross_middle[1] + cross_size // 2] = 1
+                grid[cross_middle[0] + cross_size // 2, cross_middle[1] + i] = 1
+
         grid = np.zeros(size, dtype=np.int8)
-        # select a random cross pattern and place it in a random valid position
-        self.draw_random_cross(grid, size)
-        self.draw_random_cross(grid, size)
+        # draw some cross patterns
+        for _ in range(2):
+            draw_random_cross(grid, size)
 
         # draw some random cells not intersecting with the cross
         for i in range(size[0]):
             for j in range(size[1]):
-                if grid[i, j] == 0 and self.get_neighberhood(i, j, grid) == [0, 0, 0,
-                                                                             0, 0, 0,
-                                                                             0, 0, 0]:
+                # avoid drawing cells on the cross
+                if grid[i, j] == 0 and get_neighberhood(i, j, grid) == [
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                ]:
                     grid[i, j] = np.random.randint(0, 2)
 
-        return grid
+        self.grid = grid
 
-    def get_neighberhood(self, i, j, grid=None):
-        if grid is None:
-            grid = self.grid
-        rows = grid.shape[0]
-        cols = grid.shape[1]
-        neighbor_hood = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-        x = i
-        y = j
-        # moves clockwise from top left
-        moves = [(-1, -1), (-1, 0), (-1, 1),
-                 (0, -1), (0, 0), (0, 1),
-                 (1, -1), (1, 0), (1, 1)]
-
-        # set neighbor_hood in order to check the rules
-        # set cell in the middle of the neighbor_hood
-        for move in moves:
-            if 0 <= x + move[0] < rows and 0 <= y + move[1] < cols:
-                neighbor_hood[moves.index(
-                    move)] = grid[x + move[0], y + move[1]]
-
-        return neighbor_hood
-
-    def transition(self, i, j):
+    def init_grid(self):
         """
-        This function implements the rules of the game
+        draw cell lines
         """
-        neighbor_hood = self.get_neighberhood(i, j)
+        # avoid redrawing the grid lines if the grid is updated
+        if hasattr(self, "grid_lines"):
+            return
+        for i in range(self.grid.shape[0]):
+            self.ax.plot(
+                [-0.5, self.grid.shape[1] - 0.5], [i - 0.5, i - 0.5], color="black"
+            )
+        for j in range(self.grid.shape[1]):
+            self.ax.plot(
+                [j - 0.5, j - 0.5], [-0.5, self.grid.shape[0] - 0.5], color="black"
+            )
+        self.grid_lines = True
+
+    # ========================================================================+
+    # setup buttons
+
+    def setup_buttons(self):
+        """
+        setup the 3 buttons:
+        - Clear: clear the grid
+        - Next Day: apply the rules and update the grid
+        - Reset: reset the grid to the initial state
+        """
+        # Create three buttons with equal width and no space in between
+        axnext1 = plt.axes([0.2, 0.05, 0.2, 0.075])
+        axnext2 = plt.axes([0.4, 0.05, 0.2, 0.075])
+        axnext3 = plt.axes([0.6, 0.05, 0.2, 0.075])
+
+        self.button1 = Button(axnext1, "Clear")
+        self.button3 = Button(axnext3, "Next Day")
+        self.button2 = Button(axnext2, "Reset")
+
+        self.button2.on_clicked(self.reset)
+        self.button1.on_clicked(self.clear)
+        self.button3.on_clicked(self.next_day)
 
-        ############################
-        # start the first wave
-        if neighbor_hood == [0, 1, 0,
-                             1, 1, 1,
-                             0, 1, 0]:
-            return 2
-
-        if neighbor_hood == [0, 1, 0,
-                             0, 1, 0,
-                             0, 1, 0]:
-            return 2
-
-        if neighbor_hood == [0, 1, 0,
-                             0, 1, 0,
-                             1, 1, 1]:
-            return 2
-
-        if neighbor_hood == [1, 1, 1,
-                             0, 1, 0,
-                             0, 1, 0]:
-            return 2
-
-        if neighbor_hood == [1, 0, 0,
-                             1, 1, 1,
-                             1, 0, 0]:
-            return 2
-
-        if neighbor_hood == [0, 0, 1,
-                             1, 1, 1,
-                             0, 0, 1]:
-            return 2
-
-        if neighbor_hood == [0, 0, 0,
-                             1, 1, 1,
-                             0, 0, 0]:
-            return 2
-
-        elif neighbor_hood == [0, 1, 0,
-                               0, 1, 0,
-                               0, 1, 0]:
-            return 2
-
-        elif neighbor_hood == [0, 0, 0,
-                               1, 1, 1,
-                               0, 0, 0]:
-            return 2
-
-        ############################
-        # start second wave from arms edges toward the center
-        #
-        #  0 ..       3       .. 0
-        #             |
-        #             v
-        #  3 ->  ->   2  <-  <-  3
-        #             ^
-        #             |
-        #  0 ..       3       .. 0
-        #
-        elif neighbor_hood == [0, 0, 0,
-                               0, 1, 0,
-                               1, 1, 1]:
-            return 3
-
-        elif neighbor_hood == [1, 1, 1,
-                               0, 1, 0,
-                               0, 0, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 0, 0,
-                               0, 1, 0,
-                               0, 1, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 0, 1,
-                               0, 1, 1,
-                               0, 0, 1]:
-            return 3
-
-        elif neighbor_hood == [1, 0, 0,
-                               1, 1, 0,
-                               1, 0, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 1, 0,
-                               0, 1, 0,
-                               0, 0, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 0, 0,
-                               1, 1, 0,
-                               0, 0, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 0, 0,
-                               0, 1, 1,
-                               0, 0, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 0, 0,
-                               0, 1, 0,
-                               0, 1, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 0, 2,
-                               3, 2, 2,
-                               0, 0, 2]:
-            return 3
-
-        elif neighbor_hood == [2, 2, 2,
-                               0, 2, 0,
-                               0, 3, 0]:
-            return 3
-
-        elif neighbor_hood == [2, 0, 0,
-                               2, 2, 3,
-                               2, 0, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 3, 0,
-                               0, 2, 0,
-                               2, 2, 2]:
-            return 3
-
-        elif neighbor_hood == [0, 0, 0,
-                               2, 2, 3,
-                               0, 0, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 2, 0,
-                               0, 2, 0,
-                               0, 3, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 3, 0,
-                               0, 2, 0,
-                               0, 2, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 0, 0,
-                               3, 2, 2,
-                               0, 0, 0]:
-            return 3
-
-        ############################
-        # Wave in progress - keep middle cells state
-        elif neighbor_hood == [0, 2, 0,
-                               2, 2, 2,
-                               0, 2, 0]:
-            return 2
-
-        elif neighbor_hood == [0, 2, 0,
-                               0, 2, 0,
-                               2, 2, 2]:
-            return 2
-
-        elif neighbor_hood == [2, 0, 0,
-                               2, 2, 2,
-                               2, 0, 0]:
-            return 2
-
-        elif neighbor_hood == [0, 2, 0,
-                               0, 3, 0,
-                               0, 3, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 3, 0,
-                               0, 3, 0,
-                               0, 0, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 3, 0,
-                               0, 3, 0,
-                               0, 2, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 0, 0,
-                               0, 3, 3,
-                               0, 0, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 0, 0,
-                               3, 3, 0,
-                               0, 0, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 0, 0,
-                               3, 3, 2,
-                               0, 0, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 2, 0,
-                               0, 2, 0,
-                               0, 2, 0]:
-            return 2
-
-        elif neighbor_hood == [0, 2, 0,
-                               0, 2, 0,
-                               2, 2, 2]:
-            return 2
-
-        elif neighbor_hood == [0, 3, 0,
-                               0, 3, 0,
-                               0, 2, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 0, 0,
-                               2, 2, 2,
-                               0, 0, 0]:
-            return 2
-
-        elif neighbor_hood == [0, 0, 2,
-                               2, 2, 2,
-                               0, 0, 2]:
-            return 2
-
-        elif neighbor_hood == [2, 2, 2,
-                               0, 2, 0,
-                               0, 2, 0]:
-            return 2
-
-        elif neighbor_hood == [2, 0, 0,
-                               2, 2, 2,
-                               2, 0, 0]:
-            return 2
-
-        elif neighbor_hood == [0, 0, 0,
-                               2, 3, 3,
-                               0, 0, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 2, 0,
-                               2, 2, 2,
-                               0, 2, 0]:
-            return 2
-
-        elif neighbor_hood == [0, 3, 0,
-                               0, 3, 0,
-                               0, 2, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 2, 0,
-                               0, 3, 0,
-                               0, 0, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 0, 0,
-                               0, 3, 2,
-                               0, 0, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 0, 0,
-                               2, 3, 0,
-                               0, 0, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 0, 0,
-                               0, 3, 0,
-                               0, 2, 0]:
-            return 3
-
-        ############################
-        # Wave complete successfully
-
-        elif neighbor_hood == [0, 3, 0,
-                               3, 2, 3,
-                               0, 3, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 0, 3,
-                               0, 3, 2,
-                               0, 0, 3]:
-            return 3
-
-        elif neighbor_hood == [3, 0, 0,
-                               2, 3, 0,
-                               3, 0, 0]:
-            return 3
-
-        elif neighbor_hood == [3, 2, 3,
-                               0, 3, 0,
-                               0, 0, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 0, 3,
-                               0, 3, 2,
-                               0, 0, 3]:
-            return 3
-
-        elif neighbor_hood == [0, 0, 0,
-                               0, 3, 0,
-                               3, 2, 3]:
-            return 3
-
-        elif neighbor_hood == [3, 2, 3,
-                               0, 3, 0,
-                               0, 3, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 3, 0,
-                               0, 3, 0,
-                               3, 2, 3]:
-            return 3
-
-        elif neighbor_hood == [0, 0, 3,
-                               3, 3, 2,
-                               0, 0, 3]:
-            return 3
-
-        elif neighbor_hood == [3, 0, 0,
-                               2, 3, 3,
-                               3, 0, 0]:
-            return 3
-
-        ############################
-        # Final state - preserve cross shapes
-        elif neighbor_hood == [0, 3, 0,
-                               3, 3, 3,
-                               0, 3, 0]:
-            return 3
-
-        elif neighbor_hood == [3, 0, 0,
-                               3, 3, 3,
-                               3, 0, 0]:
-            return 3
-
-        elif neighbor_hood == [3, 3, 3,
-                               0, 3, 0,
-                               0, 0, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 0, 3,
-                               0, 3, 3,
-                               0, 0, 3]:
-            return 3
-
-        elif neighbor_hood == [3, 0, 0,
-                               3, 3, 0,
-                               3, 0, 0]:
-            return 3
-
-        elif neighbor_hood == [3, 3, 3,
-                               0, 3, 0,
-                               0, 3, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 0, 0,
-                               0, 3, 0,
-                               3, 3, 3]:
-            return 3
-
-        elif neighbor_hood == [0, 3, 0,
-                               0, 3, 0,
-                               3, 3, 3]:
-            return 3
-
-        elif neighbor_hood == [0, 0, 3,
-                               3, 3, 3,
-                               0, 0, 3]:
-            return 3
-
-        elif neighbor_hood == [0, 0, 0,
-                               3, 3, 3,
-                               0, 0, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 0, 0,
-                               0, 3, 0,
-                               0, 3, 0]:
-            return 3
-
-        elif neighbor_hood == [0, 3, 0,
-                               0, 3, 0,
-                               0, 3, 0]:
-            return 3
-
-        ############################
-        # destruction
-
-        if 1 in neighbor_hood and 3 in neighbor_hood:
-            # The default rules will handle the final destruction
-            return 1
-
-        if neighbor_hood[4] == 2 and (neighbor_hood[1] != 3 or neighbor_hood[7] != 3 or neighbor_hood[3] != 3 or neighbor_hood[5] != 3):
-            return 1
-
-        # The following rules are redundant - I left them here for reference
-        if neighbor_hood == [0, 3, 0,
-                             2, 2, 2,
-                             0, 2, 0]:
-            return 1
-
-        if neighbor_hood == [0, 3, 0,
-                             2, 2, 2,
-                             0, 0, 0]:
-            return 1
-
-        if neighbor_hood == [0, 3, 0,
-                             3, 2, 3,
-                             0, 0, 0]:
-            return 1
-
-        if neighbor_hood == [0, 3, 0,
-                             3, 2, 0,
-                             0, 0, 0]:
-            return 1
-
-        if neighbor_hood == [0, 3, 0,
-                             0, 2, 3,
-                             0, 0, 0]:
-            return 1
-
-        if neighbor_hood == [0, 0, 0,
-                             3, 2, 0,
-                             0, 3, 0]:
-            return 1
-
-        if neighbor_hood == [0, 0, 0,
-                             0, 2, 3,
-                             0, 3, 0]:
-            return 1
-
-        if neighbor_hood == [0, 3, 0,
-                             3, 2, 0,
-                             0, 3, 0]:
-            return 1
-
-        if neighbor_hood == [0, 3, 0,
-                             0, 2, 3,
-                             0, 3, 0]:
-            return 1
-
-        if neighbor_hood == [0, 2, 0,
-                             3, 2, 2,
-                             0, 2, 0]:
-            return 1
-
-        if neighbor_hood == [0, 3, 0,
-                             3, 2, 2,
-                             0, 2, 0]:
-            return 1
-
-        if neighbor_hood == [0, 2, 0,
-                             2, 2, 3,
-                             0, 2, 0]:
-            return 1
-
-        if neighbor_hood == [0, 2, 0,
-                             2, 2, 3,
-                             0, 3, 0]:
-            return 1
-
-        if neighbor_hood == [0, 2, 0,
-                             0, 2, 3,
-                             0, 3, 0]:
-            return 1
-
-        if neighbor_hood == [0, 2, 0,
-                             2, 2, 2,
-                             0, 3, 0]:
-            return 1
-
-        if neighbor_hood == [0, 2, 0,
-                             0, 2, 0,
-                             3, 2, 2]:
-            return 1
-
-        if neighbor_hood == [0, 2, 0,
-                             0, 2, 0,
-                             3, 2, 3]:
-            return 1
-
-        if neighbor_hood == [0, 2, 0,
-                             0, 2, 0,
-                             2, 2, 3]:
-            return 1
-
-        if neighbor_hood == [3, 2, 2,
-                             0, 2, 0,
-                             0, 2, 0]:
-            return 1
-
-        if neighbor_hood == [3, 2, 2,
-                             0, 2, 0,
-                             0, 3, 0]:
-            return 1
-
-        if neighbor_hood == [3, 2, 2,
-                             0, 3, 0,
-                             0, 3, 0]:
-            return 1
-
-
-        elif neighbor_hood == [0, 3, 0,
-                               0, 3, 0,
-                               0, 1, 0]:
-            return 1
-
-        elif neighbor_hood == [0, 0, 0,
-                               3, 3, 1,
-                               0, 0, 0]:
-            return 1
-
-        elif neighbor_hood == [0, 0, 0,
-                               1, 3, 3,
-                               0, 0, 0]:
-            return 1
-
-        elif neighbor_hood == [0, 1, 0,
-                               0, 3, 0,
-                               0, 3, 0]:
-            return 1
-
-        elif neighbor_hood == [0, 3, 0,
-                               0, 3, 0,
-                               3, 1, 3]:
-            return 1
-
-        elif neighbor_hood == [0, 0, 3,
-                               3, 3, 1,
-                               0, 0, 3]:
-            return 1
-
-        elif neighbor_hood == [3, 0, 0,
-                               1, 3, 3,
-                               3, 0, 0]:
-            return 1
-
-        elif neighbor_hood == [3, 1, 3,
-                               0, 3, 0,
-                               0, 3, 0]:
-            return 1
-
-
-        elif neighbor_hood == [0, 0, 0,
-                               1, 3, 0,
-                               0, 0, 0]:
-            return 1
-
-        elif neighbor_hood == [0, 0, 0,
-                               0, 3, 1,
-                               0, 0, 0]:
-            return 1
-
-        elif neighbor_hood == [0, 0, 0,
-                               0, 3, 0,
-                               0, 1, 0]:
-            return 1
-
-        elif neighbor_hood == [0, 1, 0,
-                               0, 3, 0,
-                               0, 0, 0]:
-            return 1
-
-
-        else:
-            return 0
 
     def on_click(self, event):
+        if (event.xdata is None) or (event.ydata is None):
+            print("clicked outside the grid")
+            return
         i, j = int(event.ydata), int(event.xdata)
+        if i == 0 and j == 0:
+            # BUG: There is a bug here, the first cell is connected to the buttons
+            print("clicked on the axes")
+            return
         if 0 <= i < self.grid_size[0] and 0 <= j < self.grid_size[1]:
             self.grid[i, j] = 1 if self.grid[i, j] == 0 else 0
-            self.img.set_data(self.grid)
+            self.changed_indices.append((self.grid[i, j], i, j))
             self.update_grid()
+        else:
+            # maybe clicked on a button
+            pass
+
+    def next_day(self, event):
+        self.apply_rules()
+        self.update_grid()
+
+    def reset(self, event):
+        self.create_grid(self.grid_size)
+        self.update_grid()
+
+    def clear(self, event):
+        self.clear_board()
+        self.update_grid()
 
     def draw_grid(self):
-        self.ax.imshow(self.grid, cmap=self.cmap)
-        # draw cell lines
-        for i in range(self.grid.shape[0]):
-            self.ax.plot([-0.5, self.grid.shape[1] - 0.5],
-                         [i - 0.5, i - 0.5], color='black')
-        for j in range(self.grid.shape[1]):
-            self.ax.plot([j - 0.5, j - 0.5],
-                         [-0.5, self.grid.shape[0] - 0.5], color='black')
-        for i in range(self.grid.shape[0]):
-            for j in range(self.grid.shape[1]):
-                if self.grid[i, j] == 0:
-                    self.ax.add_patch(plt.Rectangle(
-                        (j-0.5, i-0.5), 1, 1, color='white'))
-                    # self.ax.text(j, i, self.grid[i, j], ha="center", va="center", color="w")
-                elif self.grid[i, j] == 1:
-                    self.ax.add_patch(plt.Rectangle(
-                        (j-0.5, i-0.5), 1, 1, color='black'))
-                    # self.ax.text(j, i, self.grid[i, j], ha="center", va="center", color="b")
-                elif self.grid[i, j] == 2:
-                    self.ax.add_patch(plt.Rectangle(
-                        (j-0.5, i-0.5), 1, 1, color='red'))
-                    # self.ax.text(j, i, self.grid[i, j], ha="center", va="center", color="r")
-                elif self.grid[i, j] == 3:
-                    self.ax.add_patch(plt.Rectangle(
-                        (j-0.5, i-0.5), 1, 1, color='blue'))
-                    # self.ax.text(j, i, self.grid[i, j], ha="center", va="center", color="g")
+        if self.changed_indices != []:
+            self.draw_changes(self.changed_indices)
+        self.changed_indices = []
+        # TODO: maybe use set_data instead of creating a new image
+
+    def draw_changes(self, changes):
+        for change in changes:
+            if change[0] == 0:
+                self.ax.add_patch(
+                    plt.Rectangle(
+                        (change[2] - 0.5, change[1] - 0.5), 1, 1, color="white"
+                    )
+                )
+            elif change[0] == 1:
+                self.ax.add_patch(
+                    plt.Rectangle(
+                        (change[2] - 0.5, change[1] - 0.5), 1, 1, color="black"
+                    )
+                )
+            elif change[0] == 2:
+                self.ax.add_patch(
+                    plt.Rectangle(
+                        (change[2] - 0.5, change[1] - 0.5), 1, 1, color="red")
+                )
+            elif change[0] == 3:
+                self.ax.add_patch(
+                    plt.Rectangle(
+                        (change[2] - 0.5, change[1] - 0.5), 1, 1, color="blue"
+                    )
+                )
 
     def update_grid(self):
         # refresh canvas
-        self.fig.canvas.draw_idle()
         self.draw_grid()
+        self.fig.canvas.draw_idle()
 
-    def next_day(self, event):
-        new_grid = self.grid.copy()
-        for i in range(self.grid.shape[0]):
-            for j in range(self.grid.shape[1]):
-                new_grid[i, j] = self.transition(i, j)
-        self.grid = new_grid
-        self.img.set_data(self.grid)
-        self.update_grid()
+    @track_changes
+    def clear_board(self):
+        self.grid = np.zeros(self.grid_size, dtype=np.int8)
 
-    def setup_button(self):
-        axnext = plt.axes([0.81, 0.05, 0.1, 0.075])
-        self.button = Button(axnext, 'Next Day')
-        self.button.on_clicked(self.next_day)
-
-    def setup_animation(self):
-        self.anim = animation.FuncAnimation(
-            self.fig, self.next_day, interval=50, blit=False)
-
-    def setup_reset_button(self):
-        axreset = plt.axes([0.7, 0.05, 0.1, 0.075])
-        self.reset_button = Button(axreset, 'Reset')
-        self.reset_button.on_clicked(self.reset)
-
-    def reset(self, event):
-        self.grid = self.create_grid(self.grid_size)
-        self.img.set_data(self.grid)
-        self.update_grid()
+    @track_changes
+    def apply_rules(self):
+        with Rules(self.grid) as r:
+            for i in range(self.grid.shape[0]):
+                for j in range(self.grid.shape[1]):
+                    self.grid[i, j] = r.transition(i, j)
 
     def run(self):
-        self.fig.canvas.mpl_connect('button_press_event', self.on_click)
+        self.fig.canvas.mpl_connect("button_press_event", self.on_click)
         plt.show()
+        ani = animation.FuncAnimation(
+            self.fig,
+            self.update_grid,
+            interval=1000,
+            blit=True,
+            repeat=False,
+            save_count=10,
+        )
+
+    def generateGif(self):
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.set_axis_off()
+        ax.set_title("My Cross Game of Life")
+        cmap = ListedColormap(["white", "black", "red", "blue", "green"], N=5)
+        img = ax.imshow(self.grid, cmap=cmap, interpolation="nearest")
+
+        def animate(i):
+            # copy first frame 4 times to make the gif slower
+            if i < 6:
+                return (img,)
+            self.apply_rules()
+            img.set_data(self.grid)
+            return (img,)
+
+        ani = animation.FuncAnimation(
+            fig,
+            animate,
+            interval=100,
+            blit=True,
+            repeat=False,
+            save_count=20,
+        )
+        ani.save("cross_game.gif", writer="pillow")
 
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     grid_size = (20, 20)
     game = GameOfLife(grid_size)
     game.run()
