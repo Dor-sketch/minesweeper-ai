@@ -10,10 +10,10 @@ The game is played on a grid of cells, where each cell can be in one of four sta
 import time
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.animation as animation
+from matplotlib import animation
 from matplotlib.widgets import Button
 from matplotlib.colors import ListedColormap
-from Rules import Rules, get_neighberhood
+from rules import CrossRules, ConwayRules, get_neighberhood
 
 def track_changes(func):
     """
@@ -42,16 +42,17 @@ class GameOfLife:
     """
     def __init__(self, grid_size):
         self.grid_size = grid_size
+        self.mode = "cross"
         self.grid = np.zeros(grid_size, dtype=np.int8)
         self.changed_indices = []
         self.create_grid(grid_size)
         self.fig, self.ax = plt.subplots()
         self.init_grid()
-        plt.subplots_adjust(bottom=0.2)
+        # plt.subplots_adjust(bottom=0.2)
         self.cmap = ListedColormap(
             ["white", "black", "red", "blue", "green"], N=5)
         self.img = self.ax.imshow(
-            self.grid, cmap=self.cmap, interpolation="nearest")
+            self.grid, cmap=self.cmap, interpolation="nearest", animated=True, aspect="equal", origin="upper")
         self.ax.set_title("My Cross Game of Life")
         self.ax.set_axis_off()
         self.setup_buttons()
@@ -133,26 +134,51 @@ class GameOfLife:
 
     # ========================================================================+
     # setup buttons
-
     def setup_buttons(self):
         """
-        setup the 3 buttons:
+        setup the 4 buttons:
         - Clear: clear the grid
         - Next Day: apply the rules and update the grid
         - Reset: reset the grid to the initial state
+        - Mode: change the mode of the game
         """
-        # Create three buttons with equal width and no space in between
-        axnext1 = plt.axes([0.2, 0.05, 0.2, 0.075])
-        axnext2 = plt.axes([0.4, 0.05, 0.2, 0.075])
-        axnext3 = plt.axes([0.6, 0.05, 0.2, 0.075])
+        # Get the window center in display coordinates
+        window_center_display = self.ax.get_window_extent().get_points().mean(0)
 
-        self.button1 = Button(axnext1, "Clear")
-        self.button3 = Button(axnext3, "Next Day")
-        self.button2 = Button(axnext2, "Reset")
+        # Convert the window center to axes coordinates
+        window_center = self.ax.transAxes.inverted().transform(window_center_display)
 
-        self.button2.on_clicked(self.reset)
-        self.button1.on_clicked(self.clear)
-        self.button3.on_clicked(self.next_day)
+        # Calculate the button positions in axes coordinates
+        button_width = 0.2
+        button_height = 0.05
+        button_positions = [
+            (window_center[0] - 1.5 * button_width, 0.01),
+            (window_center[0] - 0.5 * button_width, 0.01),
+            (window_center[0] + 0.5 * button_width, 0.01),
+            (window_center[0] + 1.5 * button_width, 0.01),
+        ]
+        # Create buttons
+        self.buttons = []
+        for i, pos in enumerate(button_positions):
+            ax = plt.axes([pos[0], pos[1], button_width, button_height])
+            button = Button(ax, ["Clear", "Next Day", "Reset", "Mode"][i], color=['red', 'green', 'yellow', 'cyan'][i], hovercolor='blue')
+            button.label.set_fontsize('large')
+            self.buttons.append(button)
+
+        # Set button callbacks
+        self.buttons[0].on_clicked(self.clear)
+        self.buttons[1].on_clicked(self.next_day)
+        self.buttons[2].on_clicked(self.reset)
+        self.buttons[3].on_clicked(self.change_mode)
+
+    def change_mode(self, event):
+        if self.mode == "cross":
+            self.mode = "conway"
+            self.buttons[3].label.set_text("Mode: Conway")
+        else:
+            self.mode = "cross"
+            self.buttons[3].label.set_text("Mode: Cross")
+
 
 
     def on_click(self, event):
@@ -227,10 +253,16 @@ class GameOfLife:
 
     @track_changes
     def apply_rules(self):
-        with Rules(self.grid) as r:
-            for i in range(self.grid.shape[0]):
-                for j in range(self.grid.shape[1]):
-                    self.grid[i, j] = r.transition(i, j)
+        if self.mode == "cross":
+            with CrossRules(self.grid) as r:
+                for i in range(self.grid.shape[0]):
+                    for j in range(self.grid.shape[1]):
+                        self.grid[i, j] = r.transition(i, j)
+        else:
+            with ConwayRules(self.grid) as r:
+                for i in range(self.grid.shape[0]):
+                    for j in range(self.grid.shape[1]):
+                        self.grid[i, j] = r.transition(i, j)
 
     def run(self):
         self.fig.canvas.mpl_connect("button_press_event", self.on_click)
@@ -269,10 +301,3 @@ class GameOfLife:
             save_count=20,
         )
         ani.save("cross_game.gif", writer="pillow")
-
-
-
-if __name__ == "__main__":
-    grid_size = (20, 20)
-    game = GameOfLife(grid_size)
-    game.run()

@@ -1,9 +1,10 @@
-
+"""
+This module contains the rules of the game.
+The rules are implemented in the Rules class.
+The Rules class is an abstract class that should be inherited by the specific rules of the game.
+"""
 
 # add decorator to track changes and store them in a list for further drawing
-
-
-
 @staticmethod
 def get_neighberhood(i, j, grid):
     """
@@ -42,6 +43,9 @@ def get_neighberhood(i, j, grid):
 
 
 class Rules:
+    """
+    This class is an abstract class that should be inherited by the specific rules of the game.
+    """
     def __init__(self, grid):
         self.grid = grid.copy()
 
@@ -52,7 +56,37 @@ class Rules:
         """clean resources"""
         del self.grid
 
+    def transition(self, i, j):
+        """
+        This function implements the rules of the game
+        """
+        raise NotImplementedError("transition method must be implemented")
 
+class ConwayRules(Rules):
+    def __init__(self, grid):
+        super().__init__(grid)
+
+    def transition(self, i, j):
+        """
+        This function implements the rules of the game
+        """
+        neighbor_hood = get_neighberhood(i, j, self.grid)
+        if neighbor_hood[4] == 1:
+            if sum(neighbor_hood) - 1 < 2:
+                return 0
+            if sum(neighbor_hood) - 1 in [2, 3]:
+                return 1
+            if sum(neighbor_hood) - 1 > 3:
+                return 0
+        else:
+            if sum(neighbor_hood) == 3:
+                return 1
+            else:
+                return 0
+
+class CrossRules(Rules):
+    def __init__(self, grid):
+        super().__init__(grid)
 
     def transition(self, i, j):
         """
