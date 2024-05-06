@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from matplotlib import animation
 from matplotlib.widgets import Button
 from matplotlib.colors import ListedColormap
-from rules import CrossRules, ConwayRules, get_neighberhood
+from Rules import CrossRules, ConwayRules, get_neighberhood
 
 def track_changes(func):
     """
