@@ -1,42 +1,82 @@
+"""
+Minesweeper game with a GUI interface using matplotlib and numpy
+Inspired by the Minesweeper game from Microsoft Windows
+Includes a reset button, a hint button, a next button, and an undo button
+
+- The next button applies the rules of Minesweeper to reveal hidden cells
+based on a costum rule set inspired by Conway's Game of Life
+- The undo button undoes the last move
+- The hint button reveals a random hidden cell
+- The reset button resets the game
+
+The game ends when a mine is hit or all non-mine cells are revealed
+The game is won when all non-mine cells are revealed
+"""
+
+import copy
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 from matplotlib.widgets import Button
-import copy
 
-FLAG_MINE = 'F'
-MAYBE_MINE = 'M'
-HIDDEN = 'H'
-BLANK = 'B'
-MINE = 'X'
+# set ply font to big for retro look
+plt.rcParams.update({"font.family": "monospace", "font.size": 18})
+plt.set_cmap("gray")
+
+FLAG_MINE = "F"
+MAYBE_MINE = "M"
+HIDDEN = "H"
+BLANK = "B"
+MINE = "X"
+
 
 class Cell:
+    """
+    Class representing a cell in the Minesweeper grid
+    """
+
     def __init__(self, value=0):
+        """
+        Initialize the cell with a value
+        """
         self.value = value
         self.hidden = True
         self.flagged = False
 
     def __repr__(self):
+        """
+        Return a string representation of the cell
+        """
         if self.flagged:
-            return "F"
+            return FLAG_MINE
         if self.hidden:
-            return "H"
-        if self.flagged:
-            return "F"
+            return HIDDEN
         if self.value == 10:
-            return "X"
+            return MINE
         return str(self.value)
 
     def is_mine(self):
+        """
+        Check if the cell is a mine
+        """
         return self.value == 10
 
     def is_empty(self):
+        """
+        Check if the cell is empty
+        """
         return self.value == 0
 
     def reveal(self):
+        """
+        Reveal the cell
+        """
         self.hidden = False
 
     def flag(self):
+        """
+        Flag the cell
+        """
         self.flagged = not self.flagged
 
     def __int__(self):
@@ -44,16 +84,26 @@ class Cell:
 
 
 class Minesweeper:
-    def __init__(self, grid_size):
+    """
+    Class representing the Minesweeper game
+    """
+
+    def __init__(self, grid_size=(16, 30)):
         self.grid_size = grid_size
         self.grid = self.create_grid()
         self.visible_grid = copy.deepcopy(self.grid)
         self.last_visible_grid = None
         self.fig, self.ax = plt.subplots()
         self.cmap = ListedColormap(["grey", "white"], name="minesweeper", N=2)
-        self.img = self.ax.imshow(np.zeros(grid_size), cmap=self.cmap, interpolation="nearest", animated=True, aspect="equal", origin="upper")
-        # make window bigger
-        self.fig.set_size_inches(8, 8)
+        self.img = self.ax.imshow(
+            np.zeros(grid_size),
+            cmap=self.cmap,
+            interpolation="nearest",
+            animated=True,
+            aspect="auto",
+            origin="upper",
+        )
+        self.fig.set_size_inches(16, 10)
         self.ax.set_title("Minesweeper")
         self.ax.set_axis_off()
         self.draw_grid()
@@ -61,22 +111,39 @@ class Minesweeper:
         self.fig.canvas.mpl_connect("button_press_event", self.on_click)
         self.init_grid()
         self.update_grid()
+        plt.subplots_adjust(left=0, right=1, bottom=0, top=1)  # Remove padding
 
     def create_grid(self):
-        return [[Cell() for _ in range(self.grid_size[1])] for _ in range(self.grid_size[0])]
+        """
+        Create a grid of cells
+        """
+        return [
+            [Cell() for _ in range(self.grid_size[1])] for _ in range(self.grid_size[0])
+        ]
 
     def init_grid(self):
+        """
+        Initialize the grid with mines and numbers
+        """
         mines = self.generate_mines()
         self.populate_grid_with_mines(mines)
 
     def generate_mines(self):
+        """
+        Generate mines in the grid
+        """
         mines = np.zeros(self.grid_size, dtype=np.int8)
-        num_mines = 40
-        mine_indices = np.random.choice(self.grid_size[0] * self.grid_size[1], num_mines, replace=False)
+        num_mines = 99
+        mine_indices = np.random.choice(
+            self.grid_size[0] * self.grid_size[1], num_mines, replace=False
+        )
         mines[np.unravel_index(mine_indices, self.grid_size)] = 1
         return mines
 
     def populate_grid_with_mines(self, mines):
+        """
+        Populate the grid with mines and numbers
+        """
         for i in range(self.grid_size[0]):
             for j in range(self.grid_size[1]):
                 if mines[i, j] == 1:
@@ -84,19 +151,73 @@ class Minesweeper:
                     self.increment_surrounding_cells(i, j)
 
     def increment_surrounding_cells(self, i, j):
+        """
+        Increment the value of surrounding cells
+        """
         for x in range(-1, 2):
             for y in range(-1, 2):
                 if 0 <= i + x < self.grid_size[0] and 0 <= j + y < self.grid_size[1]:
                     if self.grid[i + x][j + y].value != 10:
                         self.grid[i + x][j + y].value += 1
 
-    def draw_grid(self):
-        for i in range(self.grid_size[0]):
-            self.ax.plot([-0.5, self.grid_size[1] - 0.5], [i - 0.5, i - 0.5], color="black")
-        for j in range(self.grid_size[1]):
-            self.ax.plot([j - 0.5, j - 0.5], [-0.5, self.grid_size[0] - 0.5], color="black")
+    def draw_line_with_shadow(
+        self, start, end, color="black", shadow_color="gray", shadow_offset=0.1
+    ):
+        """
+        Draw a line with a shadow.
+
+        Parameters:
+        - start: tuple, the start coordinates of the line
+        - end: tuple, the end coordinates of the line
+        - color: str, the color of the line
+        - shadow_color: str, the color of the shadow
+        - shadow_offset: float, the offset of the shadow
+        """
+        self.ax.plot(
+            [start[0] + shadow_offset, end[0] + shadow_offset],
+            [start[1] + shadow_offset, end[1] + shadow_offset],
+            color=shadow_color,
+        )
+        self.ax.plot([start[0], end[0]], [start[1], end[1]], color=color)
+
+    def draw_grid(self, offset=0):
+        """
+        Draw the grid lines, using an offset to center the grid
+
+        Parameters:
+        - offset: float, the offset to center the grid
+        """
+        for i in range(self.grid_size[0] + 1):
+            self.draw_line_with_shadow(
+                start=(-0.5 + offset, i - 0.5 + offset),
+                end=(self.grid_size[1] - 0.5 + offset, i - 0.5 + offset),
+            )
+
+        for j in range(self.grid_size[1] + 1):
+            self.draw_line_with_shadow(
+                start=(j - 0.5 + offset, -0.5 + offset),
+                end=(j - 0.5 + offset, self.grid_size[0] - 0.5 + offset),
+            )
+
+        # Draw frame around the grid
+        frame_points = [
+            (-0.5 + offset, -0.5 + offset),
+            (self.grid_size[1] - 0.5 + offset, -0.5 + offset),
+            (self.grid_size[1] - 0.5 + offset, self.grid_size[0] - 0.5 + offset),
+            (-0.5 + offset, self.grid_size[0] - 0.5 + offset),
+            (-0.5 + offset, -0.5 + offset),
+        ]
+        for start, end in zip(frame_points, frame_points[1:]):
+            self.draw_line_with_shadow(start=start, end=end, color="blue")
 
     def reveal_cell(self, i, j):
+        """
+        Reveal a cell in the grid
+
+        Parameters:
+        - i: int, the row index of the cell
+        - j: int, the column index of the cell
+        """
         if self.grid[i][j].is_mine():
             self.end_game(i, j)
             return
@@ -110,16 +231,29 @@ class Minesweeper:
             self.win_game()
 
     def flag_cell(self, i, j):
+        """
+        Flag a cell in the grid
+        """
         self.update_last_visible_grid()
         if self.grid[i][j].hidden:
             self.grid[i][j].flag()
 
     def unflag_cell(self, i, j):
+        """
+        Unflag a cell in the grid
+        """
         self.update_last_visible_grid()
         if self.grid[i][j].flagged:
             self.grid[i][j].flagged = False
 
     def end_game(self, i, j):
+        """
+        End the game when a mine is hit
+
+        Parameters:
+        - i: int, the row index of the cell
+        - j: int, the column index of the cell
+        """
         print(f"Game Over! You hit a mine on cell ({i}, {j})")
         self.grid[i][j].value = 100
         self.fig.set_facecolor("red")
@@ -150,6 +284,9 @@ class Minesweeper:
                     self.grid[i][j].reveal()
 
     def check_win(self):
+        """
+        Check if the game is won
+        """
         for i in range(self.grid_size[0]):
             for j in range(self.grid_size[1]):
                 if not self.grid[i][j].is_mine() and self.grid[i][j].hidden:
@@ -157,26 +294,65 @@ class Minesweeper:
         return True
 
     def update_grid(self):
+        """
+        Update the grid display
+        """
         self.ax.clear()
-        status = f'Flags: {sum(1 for row in self.grid for cell in row if cell.flagged)} out of {sum(1 for row in self.grid for cell in row if cell.is_mine())}'
+        status = f"Flags: {sum(1 for row in self.grid for cell in row if cell.flagged)} out of {sum(1 for row in self.grid for cell in row if cell.is_mine())}"
         self.ax.set_title(status)
-        grid_display = np.array([[cell.hidden == False for cell in row] for row in self.grid], dtype=np.float32)
-        self.img = self.ax.imshow(grid_display, cmap=self.cmap, interpolation="nearest", animated=True, aspect="equal", origin="upper")
+        grid_display = np.array(
+            [[cell.hidden is False for cell in row] for row in self.grid],
+            dtype=np.float32,
+        )
+        self.img = self.ax.imshow(
+            grid_display,
+            cmap=self.cmap,
+            interpolation="nearest",
+            animated=True,
+            aspect="equal",
+            origin="upper",
+        )
         self.ax.set_axis_off()
         self.draw_grid()
-        colors = {1: 'blue', 2: 'green', 3: 'yellow', 4: 'orange', 5: 'red', 6: 'purple', 7: 'brown', 8: 'black', 10: 'black', 11: 'black', 12: 'black'}
+        colors = {
+            1: "blue",
+            2: "green",
+            3: "yellow",
+            4: "orange",
+            5: "red",
+            6: "purple",
+            7: "brown",
+            8: "black",
+            10: "black",
+            11: "black",
+            12: "black",
+        }
         for i in range(self.grid_size[0]):
             for j in range(self.grid_size[1]):
                 if 0 < self.grid[i][j].value < 10 and not self.grid[i][j].hidden:
-                    color = colors.get(self.grid[i][j].value, 'black')
-                    self.ax.text(j, i, str(self.grid[i][j].value), ha='center', va='center', color=color)
+                    color = colors.get(self.grid[i][j].value, "black")
+                    self.ax.text(
+                        j,
+                        i,
+                        str(self.grid[i][j].value),
+                        ha="center",
+                        va="center",
+                        color=color,
+                    )
                 elif self.grid[i][j].flagged:
-                    self.ax.text(j, i, "⚑", ha='center', va='center', color='black')
+                    self.ax.text(j, i, "⚑", ha="center", va="center", color="black")
                 elif self.grid[i][j].value == 100:
-                    self.ax.text(j, i, "☠", ha='center', va='center', color='black')
+                    self.ax.text(j, i, "☠", ha="center", va="center", color="black")
 
         self.fig.canvas.draw_idle()
+
     def on_click(self, event):
+        """
+        Handle the mouse click event
+
+        Parameters:
+        - event: event, the mouse click event
+        """
         if event.xdata is None or event.ydata is None:
             return
 
@@ -195,6 +371,9 @@ class Minesweeper:
             self.update_grid()
 
     def setup_buttons(self):
+        """
+        Setup the buttons for the game
+        """
         button_positions = [0.1, 0.2, 0.3, 0.4]
         button_labels = ["Reset", "Hint", "Next", "Undo"]
         button_colors = ["green", "orange", "blue", "red"]
@@ -202,8 +381,8 @@ class Minesweeper:
         self.buttons = []
         for pos, label, color in zip(button_positions, button_labels, button_colors):
             ax = plt.axes([pos, 0.01, 0.1, 0.05])
-            button = Button(ax, label, color=color, hovercolor='lightblue')
-            button.label.set_fontsize('large')
+            button = Button(ax, label, color=color, hovercolor="lightblue")
+            button.label.set_fontsize("large")
             self.buttons.append(button)
 
         self.buttons[0].on_clicked(self.reset_game)
@@ -212,6 +391,9 @@ class Minesweeper:
         self.buttons[3].on_clicked(self.undo_last_move)
 
     def undo_last_move(self, event):
+        """
+        Undo the last move
+        """
         if self.last_visible_grid:
             self.fig.set_facecolor("white")
             self.grid = copy.deepcopy(self.last_visible_grid)
@@ -219,29 +401,40 @@ class Minesweeper:
             self.fig.canvas.draw_idle()
 
     def apply_rules(self, board):
+        """
+        Apply the rules of Minesweeper to update the visible grid one step
+        """
         rules = MinesweeperRules(board)
         next_visible_grid = rules.transition()
         for i in range(self.grid_size[0]):
             for j in range(self.grid_size[1]):
-                if next_visible_grid[i][j] == 'X':
+                if next_visible_grid[i][j] == "X":
                     self.grid[i][j].hidden = False
-                elif next_visible_grid[i][j] == 'F':
+                elif next_visible_grid[i][j] == "F":
                     self.grid[i][j].flagged = True
         self.update_grid()
 
     def next_day(self, event):
+        """
+        Apply the rules of Minesweeper to update the visible grid one step
+        """
         self.last_visible_grid = copy.deepcopy(self.grid)
-        board = [['_' for _ in range(self.grid_size[1])] for _ in range(self.grid_size[0])]
+        board = [
+            ["_" for _ in range(self.grid_size[1])] for _ in range(self.grid_size[0])
+        ]
         for i in range(self.grid_size[0]):
             for j in range(self.grid_size[1]):
                 if self.grid[i][j].flagged:
-                    board[i][j] = 'F'
+                    board[i][j] = "F"
                 elif not self.grid[i][j].hidden:
                     board[i][j] = str(self.grid[i][j].value)
             board.append([])
         self.apply_rules(board)
 
     def reset_game(self, event):
+        """
+        Reset the game
+        """
         self.fig.set_facecolor("white")
         self.grid = self.create_grid()
         self.visible_grid = copy.deepcopy(self.grid)
@@ -250,6 +443,9 @@ class Minesweeper:
         self.update_grid()
 
     def give_hint(self, event):
+        """
+        Give a hint by revealing a random hidden cell
+        """
         for i in range(self.grid_size[0]):
             for j in range(self.grid_size[1]):
                 if not self.grid[i][j].is_mine() and self.grid[i][j].hidden:
@@ -258,16 +454,26 @@ class Minesweeper:
         self.update_grid()
 
     def run(self):
+        """
+        Run the Minesweeper game
+        """
         plt.show()
 
 
 class MinesweeperRules:
+    """
+    Class representing the rules of Minesweeper as a cellular automaton
+    """
+
     def __init__(self, visible_grid):
         # generate a grid of hidden cells and revealed cells
         self.grid_size = (len(visible_grid), len(visible_grid[0]))
         self.visible_grid = visible_grid
 
     def transition(self):
+        """
+        Apply the rules of Minesweeper to update the visible grid one step
+        """
         for i in range(len(self.visible_grid)):
             for j in range(len(self.visible_grid[i])):
                 print(self.visible_grid[i][j], end=" ")
@@ -275,53 +481,87 @@ class MinesweeperRules:
         next_grid = copy.deepcopy(self.visible_grid)
         for i in range(len(self.visible_grid)):
             for j in range(len(self.visible_grid[i])):
-                if self.visible_grid[i][j] != 'F' and self.visible_grid[i][j] != '_':
+                if self.visible_grid[i][j] != "F" and self.visible_grid[i][j] != "_":
                     self.apply_rules(i, j, next_grid)
         return next_grid
 
     def apply_rules(self, i, j, next_grid):
-        neighborhood = self.get_neighborhood(i, j)
-        mines_on_neighbors = sum(1 for cell in neighborhood if cell == 'F')
-        hidden_cells = sum(1 for cell in neighborhood if cell == '_')
+        """
+        Apply the rules of Minesweeper to update the visible grid at cell (i, j)
 
-        cell_value = int(self.visible_grid[i][j])  # Get the value of the current cell
+        Parameters:
+        - i: int, the row index of the cell
+        - j: int, the column index of the cell
+        - next_grid: list, the next visible grid
+        """
+        neighborhood = self.get_neighborhood(i, j)
+        mines_on_neighbors = sum(1 for cell in neighborhood if cell == "F")
+        hidden_cells = sum(1 for cell in neighborhood if cell == "_")
+
+        # Get the value of the current cell
+        cell_value = int(self.visible_grid[i][j])
 
         # Rule 1: Flag cells if hidden_cells + mines_on_neighbors equals the cell value
         if hidden_cells + mines_on_neighbors == cell_value:
             for ni, nj in self.get_neighborhood_indices(i, j):
-                if self.visible_grid[ni][nj] == '_':
+                if self.visible_grid[ni][nj] == "_":
                     print(f"Flagging cell ({ni}, {nj})")
-                    next_grid[ni][nj] = 'F'
+                    next_grid[ni][nj] = "F"
 
         for ni, nj in self.get_neighborhood_indices(i, j):
-            if self.visible_grid[ni][nj] != 'F' and self.visible_grid[ni][nj] != '_':
+            if self.visible_grid[ni][nj] != "F" and self.visible_grid[ni][nj] != "_":
                 # check if the other cell has enough mines around it
                 neighborhood = self.get_neighborhood(ni, nj)
-                mines_on_neighbors = sum(1 for cell in neighborhood if cell == 'F')
+                mines_on_neighbors = sum(1 for cell in neighborhood if cell == "F")
                 if mines_on_neighbors == int(self.visible_grid[ni][nj]):
                     for nni, nnj in self.get_neighborhood_indices(ni, nj):
-                        if self.visible_grid[nni][nnj] == '_':
-                            next_grid[nni][nnj] = 'X'
+                        if self.visible_grid[nni][nnj] == "_":
+                            next_grid[nni][nnj] = "X"
 
     def get_neighborhood(self, i, j):
+        """
+        Get the neighborhood of a cell at (i, j)
+
+        Parameters:
+        - i: int, the row index of the cell
+        - j: int, the column index of the cell
+
+        Returns:
+        - list, the neighborhood of the cell
+        """
         neighborhood = []
         for x in range(-1, 2):
             for y in range(-1, 2):
                 ni, nj = i + x, j + y
-                if 0 <= ni < len(self.visible_grid) and 0 <= nj < len(self.visible_grid[ni]):
+                if 0 <= ni < len(self.visible_grid) and 0 <= nj < len(
+                    self.visible_grid[ni]
+                ):
                     neighborhood.append(self.visible_grid[ni][nj])
         return neighborhood
 
     def get_neighborhood_indices(self, i, j):
+        """
+        Get the indices of the neighborhood of a cell at (i, j)
+
+        Parameters:
+        - i: int, the row index of the cell
+        - j: int, the column index of the cell
+
+        Returns:
+        - list, the indices of the neighborhood of the cell
+        """
         indices = []
         for x in range(-1, 2):
             for y in range(-1, 2):
                 ni, nj = i + x, j + y
-                if 0 <= ni < len(self.visible_grid) and 0 <= nj < len(self.visible_grid[ni]):
+                if 0 <= ni < len(self.visible_grid) and 0 <= nj < len(
+                    self.visible_grid[ni]
+                ):
                     indices.append((ni, nj))
         return indices
 
+
 if __name__ == "__main__":
-    grid_size = (16, 16)
+    grid_size = (16, 30)
     game = Minesweeper(grid_size)
     game.run()
