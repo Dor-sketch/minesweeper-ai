@@ -218,20 +218,28 @@ class Minesweeper:
             self.update_grid()
             self.fig.canvas.draw_idle()
 
-    def apply_rules(self):
-        rules = MinesweeperRules(copy.deepcopy(self.grid))
+    def apply_rules(self, board):
+        rules = MinesweeperRules(board)
         next_visible_grid = rules.transition()
         for i in range(self.grid_size[0]):
             for j in range(self.grid_size[1]):
-                if next_visible_grid[i][j].hidden == False:
+                if next_visible_grid[i][j] == 'X':
                     self.grid[i][j].hidden = False
-                elif next_visible_grid[i][j].flagged:
+                elif next_visible_grid[i][j] == 'F':
                     self.grid[i][j].flagged = True
         self.update_grid()
 
     def next_day(self, event):
         self.last_visible_grid = copy.deepcopy(self.grid)
-        self.apply_rules()
+        board = [['_' for _ in range(self.grid_size[1])] for _ in range(self.grid_size[0])]
+        for i in range(self.grid_size[0]):
+            for j in range(self.grid_size[1]):
+                if self.grid[i][j].flagged:
+                    board[i][j] = 'F'
+                elif not self.grid[i][j].hidden:
+                    board[i][j] = str(self.grid[i][j].value)
+            board.append([])
+        self.apply_rules(board)
 
     def reset_game(self, event):
         self.fig.set_facecolor("white")
@@ -257,61 +265,50 @@ class MinesweeperRules:
     def __init__(self, visible_grid):
         # generate a grid of hidden cells and revealed cells
         self.grid_size = (len(visible_grid), len(visible_grid[0]))
-        self.visible_grid = [[Cell() for j in range(self.grid_size[1])] for i in range(self.grid_size[0])]
-        for i in range(self.grid_size[0]):
-            for j in range(self.grid_size[1]):
-                print(f"({i}, {j})")
-                self.visible_grid[i][j].hidden = True
-                if visible_grid[i][j].flagged:
-                    self.visible_grid[i][j].flagged = True
-                    self.visible_grid[i][j].value = 10
-                    print(f"Flagging cell ({i}, {j})")
-                if visible_grid[i][j].hidden == False:
-                    self.visible_grid[i][j].value = int(visible_grid[i][j])
-                    self.visible_grid[i][j].flagged = False
-                    self.visible_grid[i][j].hidden = False
+        self.visible_grid = visible_grid
 
     def transition(self):
+        for i in range(len(self.visible_grid)):
+            for j in range(len(self.visible_grid[i])):
+                print(self.visible_grid[i][j], end=" ")
+            print()
         next_grid = copy.deepcopy(self.visible_grid)
         for i in range(len(self.visible_grid)):
             for j in range(len(self.visible_grid[i])):
-                if not self.visible_grid[i][j].hidden and 0 < int(self.visible_grid[i][j]) < 10:
+                if self.visible_grid[i][j] != 'F' and self.visible_grid[i][j] != '_':
                     self.apply_rules(i, j, next_grid)
         return next_grid
 
     def apply_rules(self, i, j, next_grid):
         neighborhood = self.get_neighborhood(i, j)
-        mines_on_neighbors = sum(1 for cell in neighborhood if cell.flagged)
-        hidden_cells = sum(1 for cell in neighborhood if cell.hidden)
+        mines_on_neighbors = sum(1 for cell in neighborhood if cell == 'F')
+        hidden_cells = sum(1 for cell in neighborhood if cell == '_')
 
         cell_value = int(self.visible_grid[i][j])  # Get the value of the current cell
 
         # Rule 1: Flag cells if hidden_cells + mines_on_neighbors equals the cell value
         if hidden_cells + mines_on_neighbors == cell_value:
             for ni, nj in self.get_neighborhood_indices(i, j):
-                if self.visible_grid[ni][nj].hidden and not self.visible_grid[ni][nj].flagged:
-                    next_grid[ni][nj].flagged = True
-
+                if self.visible_grid[ni][nj] == '_':
+                    print(f"Flagging cell ({ni}, {nj})")
+                    next_grid[ni][nj] = 'F'
 
         for ni, nj in self.get_neighborhood_indices(i, j):
-            if self.visible_grid[ni][nj].hidden == False:
+            if self.visible_grid[ni][nj] != 'F' and self.visible_grid[ni][nj] != '_':
                 # check if the other cell has enough mines around it
                 neighborhood = self.get_neighborhood(ni, nj)
-                mines_on_neighbors = sum(1 for cell in neighborhood if cell.flagged or cell.value == 10)
-                print(neighborhood)
-                print(f'({ni}, {nj}) has {mines_on_neighbors} mines on neighbors')
+                mines_on_neighbors = sum(1 for cell in neighborhood if cell == 'F')
                 if mines_on_neighbors == int(self.visible_grid[ni][nj]):
                     for nni, nnj in self.get_neighborhood_indices(ni, nj):
-                        if self.visible_grid[nni][nnj].hidden and not self.visible_grid[nni][nnj].flagged:
-                            next_grid[nni][nnj].hidden = False
-                            print(f"Revealing cell ({nni}, {nnj})")
+                        if self.visible_grid[nni][nnj] == '_':
+                            next_grid[nni][nnj] = 'X'
 
     def get_neighborhood(self, i, j):
         neighborhood = []
         for x in range(-1, 2):
             for y in range(-1, 2):
                 ni, nj = i + x, j + y
-                if 0 <= ni < len(self.visible_grid) and 0 <= nj < len(self.visible_grid[i]):
+                if 0 <= ni < len(self.visible_grid) and 0 <= nj < len(self.visible_grid[ni]):
                     neighborhood.append(self.visible_grid[ni][nj])
         return neighborhood
 
@@ -320,10 +317,9 @@ class MinesweeperRules:
         for x in range(-1, 2):
             for y in range(-1, 2):
                 ni, nj = i + x, j + y
-                if 0 <= ni < len(self.visible_grid) and 0 <= nj < len(self.visible_grid[i]):
+                if 0 <= ni < len(self.visible_grid) and 0 <= nj < len(self.visible_grid[ni]):
                     indices.append((ni, nj))
         return indices
-
 
 if __name__ == "__main__":
     grid_size = (16, 16)
