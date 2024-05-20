@@ -82,6 +82,10 @@ A Python implementation of the classic Minesweeper game with a graphical user in
     - Left-click to reveal a cell.
     - Right-click to flag a cell as a mine.
 
+### Gameplay Demo
+
+[Watch the video here](https://github.com/Dor-sketch/CrossFinder/assets/138825033/4e8cf038-e8fe-47e1-ae52-d8ab8e3b45c3)
+
 ### Gameplay Instructions
 
 - **Objective**: Reveal all non-mine cells without hitting a mine.
