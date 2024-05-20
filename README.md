@@ -44,7 +44,7 @@ A Python implementation of the classic Minesweeper game with a graphical user in
 <p align="center">
   <i>Minesweeper Game Retro GUI
   <br>
-  <img src="./images/mines_grad.png" alt="Minesweeper" width="500"/>
+  <img src="./images/mines_grad.png" alt="Minesweeper" width="860"/>
 </p>
 
 ### Minesweeper Features
@@ -107,7 +107,7 @@ A Python implementation of the classic Minesweeper game with a graphical user in
 <p align="center">
   <i>Skulls indicate mines in the game</i>
   <br>
-  <img src="./images/skull.png" alt="Minesweeper Gameplay" width="500"/>
+  <img src="./images/skull.png" alt="Minesweeper Gameplay" width="860"/>
 </p>
 
 ### How the Minesweeper Solver Works
@@ -166,7 +166,7 @@ CrossFinder is an innovative variant of Conway's Game of Life, meticulously engi
 This ingenious program was conceived as a response to problem 28 in the seminal book **Biological Computation** by Ehud Lamm and Ron Unger. It was developed as a key component of the "Biological Computation" course at the Open University of Israel. The solution, amalgamated with another program ([simulationEarth](https://github.com/Dor-sketch/SimulationEarth)), was submitted and acclaimed with a perfect score of 100.
 
 <p align="center">
-  <img src="./images/cross_game.gif" alt="CrossFinder" width="500"/>
+  <img src="./images/cross_game.gif" alt="CrossFinder" width="860"/>
     <p align="center">
         <i>Algorithm identify target '+' shape</i>
     </p>
