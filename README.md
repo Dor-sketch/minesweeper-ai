@@ -181,6 +181,10 @@ If more than one python version is installed, try use the following command:
     python3.11 cross_game.py
 ```
 
+### Crossfinder Demo
+
+[Watch the video here](https://github.com/Dor-sketch/CrossFinder/assets/138825033/acc9e89c-985e-46d6-8971-35d12319dff8)
+
 ---
 
 ### CrossFinder GUI
