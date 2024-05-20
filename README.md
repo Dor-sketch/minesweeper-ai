@@ -87,7 +87,7 @@ A Python implementation of the classic Minesweeper game with a graphical user in
 
 ### Gameplay Demo
 
-[Watch the video here](https://github.com/Dor-sketch/CrossFinder/assets/138825033/4e8cf038-e8fe-47e1-ae52-d8ab8e3b45c3)
+[Watch the video here](https://github.com/Dor-sketch/CrossFinder/assets/138825033/0b47e63a-9fa8-4b1f-b0a9-17ac5f92b7f7)
 
 ### Gameplay Instructions
 
