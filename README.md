@@ -42,7 +42,9 @@ Both projects utilize basic Python libraries such as `NumPy` and `Matplotlib`, a
 A Python implementation of the classic Minesweeper game with a graphical user interface (GUI) using Matplotlib and NumPy. This project includes additional features like reset, hint, next, and undo buttons.
 
 <p align="center">
-  <img src="./images/mines99.png" alt="Minesweeper" width="500"/>
+  <i>Minesweeper Game Retro GUI
+  <br>
+  <img src="./images/mines_grad.png" alt="Minesweeper" width="500"/>
 </p>
 
 ### Minesweeper Features
@@ -101,6 +103,12 @@ A Python implementation of the classic Minesweeper game with a graphical user in
   - Hint: Reveals a random hidden cell.
   - Next: Applies custom rules to reveal hidden cells.
   - Undo: Reverts the last move.
+
+<p align="center">
+  <i>Skulls indicate mines in the game</i>
+  <br>
+  <img src="./images/skull.png" alt="Minesweeper Gameplay" width="500"/>
+</p>
 
 ### How the Minesweeper Solver Works
 

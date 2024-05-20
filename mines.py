@@ -18,16 +18,25 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 from matplotlib.widgets import Button
+from matplotlib import patches
+from mines_config import (
+    FLAG_MINE,
+    HIDDEN,
+    MINE,
+    BACKROUND_COLOR,
+    BUTTONS_GAP,
+    BUTTONS_Y,
+    TO_BE_REVEALED,
+    REVEALED_FACE_COLOR,
+    HIDDEN_FACE_COLOR,
+    NUN_OF_MINES,
+    colors,
+)
 
 # set ply font to big for retro look
-plt.rcParams.update({"font.family": "monospace", "font.size": 18})
-plt.set_cmap("gray")
-
-FLAG_MINE = "F"
-MAYBE_MINE = "M"
-HIDDEN = "H"
-BLANK = "B"
-MINE = "X"
+plt.rcParams.update(
+    {"font.family": "monospace", "font.size": 18, "font.weight": "bold"}
+)
 
 
 class Cell:
@@ -51,7 +60,7 @@ class Cell:
             return FLAG_MINE
         if self.hidden:
             return HIDDEN
-        if self.value == 10:
+        if self.value == MINE:
             return MINE
         return str(self.value)
 
@@ -59,7 +68,7 @@ class Cell:
         """
         Check if the cell is a mine
         """
-        return self.value == 10
+        return self.value == MINE
 
     def is_empty(self):
         """
@@ -89,29 +98,37 @@ class Minesweeper:
     """
 
     def __init__(self, grid_size=(16, 30)):
+        """
+        Initialize the Minesweeper game with a grid size
+        """
         self.grid_size = grid_size
         self.grid = self.create_grid()
         self.visible_grid = copy.deepcopy(self.grid)
         self.last_visible_grid = None
         self.fig, self.ax = plt.subplots()
-        self.cmap = ListedColormap(["grey", "white"], name="minesweeper", N=2)
+        self.generate_background()
+        self.cmap = ListedColormap(["lightgrey", "white"], name="minesweeper", N=2)
         self.img = self.ax.imshow(
             np.zeros(grid_size),
             cmap=self.cmap,
             interpolation="nearest",
             animated=True,
-            aspect="auto",
+            aspect="equal",  # set aspect to 'equal' to maintain grid proportions
             origin="upper",
         )
         self.fig.set_size_inches(16, 10)
         self.ax.set_title("Minesweeper")
         self.ax.set_axis_off()
+        self.init_grid()
         self.draw_grid()
         self.setup_buttons()
         self.fig.canvas.mpl_connect("button_press_event", self.on_click)
-        self.init_grid()
         self.update_grid()
-        plt.subplots_adjust(left=0, right=1, bottom=0, top=1)  # Remove padding
+        # plt.subplots_adjust(left=0, right=1, bottom=0, top=1)  # Remove padding
+
+        # Center the grid in the window
+        self.ax.set_xlim(-0.5, grid_size[1] - 0.5)
+        self.ax.set_ylim(grid_size[0] - 0.5, -0.5)
 
     def create_grid(self):
         """
@@ -120,6 +137,23 @@ class Minesweeper:
         return [
             [Cell() for _ in range(self.grid_size[1])] for _ in range(self.grid_size[0])
         ]
+
+    def generate_background(self):
+        """
+        Generate a gradient background for the game
+        """
+        # Create a gradient image
+        gradient = np.linspace(0, 1, 256)  # generate gradient
+        gradient = np.vstack((gradient, gradient))  # stack to create 2D array
+        # Create a full-figure axis for the gradient background
+        bg_ax = self.fig.add_axes([0, 0, 1, 1], zorder=-1)  # full figure axis
+        bg_ax.imshow(
+            gradient,
+            aspect="auto",
+            cmap="YlGnBu",
+            extent=[0, self.grid_size[1], 0, self.grid_size[0]],
+        )
+        bg_ax.axis("Tight")
 
     def init_grid(self):
         """
@@ -133,7 +167,7 @@ class Minesweeper:
         Generate mines in the grid
         """
         mines = np.zeros(self.grid_size, dtype=np.int8)
-        num_mines = 99
+        num_mines = NUN_OF_MINES
         mine_indices = np.random.choice(
             self.grid_size[0] * self.grid_size[1], num_mines, replace=False
         )
@@ -147,7 +181,7 @@ class Minesweeper:
         for i in range(self.grid_size[0]):
             for j in range(self.grid_size[1]):
                 if mines[i, j] == 1:
-                    self.grid[i][j].value = 10  # Corrected mine value
+                    self.grid[i][j].value = MINE  # Corrected mine value
                     self.increment_surrounding_cells(i, j)
 
     def increment_surrounding_cells(self, i, j):
@@ -157,58 +191,140 @@ class Minesweeper:
         for x in range(-1, 2):
             for y in range(-1, 2):
                 if 0 <= i + x < self.grid_size[0] and 0 <= j + y < self.grid_size[1]:
-                    if self.grid[i + x][j + y].value != 10:
+                    if self.grid[i + x][j + y].value != MINE:
                         self.grid[i + x][j + y].value += 1
 
-    def draw_line_with_shadow(
-        self, start, end, color="black", shadow_color="gray", shadow_offset=0.1
-    ):
+    def draw_line_with_shadow(self, start, end, color="black", linewidth=1):
         """
-        Draw a line with a shadow.
+        Draw a line with a shadow effect
 
         Parameters:
-        - start: tuple, the start coordinates of the line
-        - end: tuple, the end coordinates of the line
+        - start: tuple, the start point of the line
+        - end: tuple, the end point of the line
         - color: str, the color of the line
-        - shadow_color: str, the color of the shadow
-        - shadow_offset: float, the offset of the shadow
+        - linewidth: int, the width of the line
         """
         self.ax.plot(
-            [start[0] + shadow_offset, end[0] + shadow_offset],
-            [start[1] + shadow_offset, end[1] + shadow_offset],
-            color=shadow_color,
+            [start[0], end[0]], [start[1], end[1]], color=color, linewidth=linewidth
         )
-        self.ax.plot([start[0], end[0]], [start[1], end[1]], color=color)
 
-    def draw_grid(self, offset=0):
+    def draw_revealed_cell(self, i, j):
         """
-        Draw the grid lines, using an offset to center the grid
+        Draw a revealed cell in the grid
+
+        Parameters:
+        - i: int, the row index of the cell
+        - j: int, the column index of the cell
+        """
+        # Draw the cell
+        self.ax.add_patch(
+            patches.Rectangle(
+                (j - 0.5, i - 0.5),
+                1,
+                1,
+                edgecolor="none",
+                facecolor=REVEALED_FACE_COLOR,
+                linewidth=1,
+            )
+        )
+
+        # Draw the top and left edges (darker for sunken effect)
+        self.draw_line_with_shadow(
+            (j - 0.5, i - 0.5), (j + 0.5, i - 0.5), color="grey", linewidth=1
+        )
+        self.draw_line_with_shadow(
+            (j - 0.5, i - 0.5), (j - 0.5, i + 0.5), color="grey", linewidth=1
+        )
+
+        # Draw the bottom and right edges (lighter for sunken effect)
+        self.draw_line_with_shadow(
+            (j - 0.5, i + 0.5), (j + 0.5, i + 0.5), color="white", linewidth=1
+        )
+        self.draw_line_with_shadow(
+            (j + 0.5, i - 0.5), (j + 0.5, i + 0.5), color="white", linewidth=1
+        )
+
+    def draw_unrevealed_cell(self, i, j):
+        """
+        Draw an unrevealed cell in the grid
+
+        Parameters:
+        - i: int, the row index of the cell
+        - j: int, the column index of the cell
+        """
+        # Draw the cell
+        self.ax.add_patch(
+            patches.Rectangle(
+                (j - 0.5, i - 0.5),
+                1,
+                1,
+                edgecolor="none",
+                facecolor=HIDDEN_FACE_COLOR,
+                linewidth=0,
+            )
+        )
+
+        # Draw the top and left edges (lighter for raised effect)
+        self.draw_line_with_shadow(
+            (j - 0.5, i - 0.5), (j + 0.5, i - 0.5), color="white", linewidth=1
+        )
+        self.draw_line_with_shadow(
+            (j - 0.5, i - 0.5), (j - 0.5, i + 0.5), color="white", linewidth=1
+        )
+
+        # Draw the bottom and right edges (darker for raised effect)
+        self.draw_line_with_shadow(
+            (j - 0.5, i + 0.5), (j + 0.5, i + 0.5), color="grey", linewidth=1
+        )
+        self.draw_line_with_shadow(
+            (j + 0.5, i - 0.5), (j + 0.5, i + 0.5), color="grey", linewidth=1
+        )
+
+    def draw_3d_frame(self, offset=0.5):
+        """
+        Draw a 3D frame around the entire grid.
+        """
+        # Coordinates of the outer frame
+        frame_points = [
+            (-offset, -offset),
+            (self.grid_size[1] - offset, -offset),
+            (self.grid_size[1] - offset, self.grid_size[0] - offset),
+            (-offset, self.grid_size[0] - offset),
+            (-offset, -offset),
+        ]
+
+        # Draw the top and left edges (lighter for raised effect)
+        self.draw_line_with_shadow(
+            frame_points[0], frame_points[1], color="white", linewidth=2
+        )
+        self.draw_line_with_shadow(
+            frame_points[0], frame_points[3], color="white", linewidth=2
+        )
+
+        # Draw the bottom and right edges (darker for raised effect)
+        self.draw_line_with_shadow(
+            frame_points[1], frame_points[2], color="grey", linewidth=2
+        )
+        self.draw_line_with_shadow(
+            frame_points[3], frame_points[2], color="grey", linewidth=2
+        )
+
+    def draw_grid(self):
+        """
+        Draw the grid lines with 3D-like buttons, using an offset to center the grid
 
         Parameters:
         - offset: float, the offset to center the grid
         """
-        for i in range(self.grid_size[0] + 1):
-            self.draw_line_with_shadow(
-                start=(-0.5 + offset, i - 0.5 + offset),
-                end=(self.grid_size[1] - 0.5 + offset, i - 0.5 + offset),
-            )
+        for i in range(self.grid_size[0]):
+            for j in range(self.grid_size[1]):
+                if self.grid[i][j].hidden:
+                    self.draw_unrevealed_cell(i, j)
+                else:
+                    self.draw_revealed_cell(i, j)
 
-        for j in range(self.grid_size[1] + 1):
-            self.draw_line_with_shadow(
-                start=(j - 0.5 + offset, -0.5 + offset),
-                end=(j - 0.5 + offset, self.grid_size[0] - 0.5 + offset),
-            )
-
-        # Draw frame around the grid
-        frame_points = [
-            (-0.5 + offset, -0.5 + offset),
-            (self.grid_size[1] - 0.5 + offset, -0.5 + offset),
-            (self.grid_size[1] - 0.5 + offset, self.grid_size[0] - 0.5 + offset),
-            (-0.5 + offset, self.grid_size[0] - 0.5 + offset),
-            (-0.5 + offset, -0.5 + offset),
-        ]
-        for start, end in zip(frame_points, frame_points[1:]):
-            self.draw_line_with_shadow(start=start, end=end, color="blue")
+        # Draw the 3D frame around the grid
+        self.draw_3d_frame()
 
     def reveal_cell(self, i, j):
         """
@@ -255,15 +371,25 @@ class Minesweeper:
         - j: int, the column index of the cell
         """
         print(f"Game Over! You hit a mine on cell ({i}, {j})")
-        self.grid[i][j].value = 100
+        self.grid[i][j].value = MINE
         self.fig.set_facecolor("red")
         self.show_all_mines()
         self.fig.canvas.draw_idle()
 
     def update_last_visible_grid(self):
+        """
+        Update the last visible grid
+        """
         self.last_visible_grid = copy.deepcopy(self.grid)
 
     def reveal_surrounding_cells(self, i, j):
+        """
+        Reveal the surrounding cells of a cell
+
+        Parameters:
+        - i: int, the row index of the cell
+        - j: int, the column index of the cell
+        """
         for x in range(-1, 2):
             for y in range(-1, 2):
                 ni, nj = i + x, j + y
@@ -298,7 +424,7 @@ class Minesweeper:
         Update the grid display
         """
         self.ax.clear()
-        status = f"Flags: {sum(1 for row in self.grid for cell in row if cell.flagged)} out of {sum(1 for row in self.grid for cell in row if cell.is_mine())}"
+        status = f"Marked: {sum(1 for row in self.grid for cell in row if cell.flagged)} / {sum(1 for row in self.grid for cell in row if cell.is_mine())}"
         self.ax.set_title(status)
         grid_display = np.array(
             [[cell.hidden is False for cell in row] for row in self.grid],
@@ -314,22 +440,10 @@ class Minesweeper:
         )
         self.ax.set_axis_off()
         self.draw_grid()
-        colors = {
-            1: "blue",
-            2: "green",
-            3: "yellow",
-            4: "orange",
-            5: "red",
-            6: "purple",
-            7: "brown",
-            8: "black",
-            10: "black",
-            11: "black",
-            12: "black",
-        }
+
         for i in range(self.grid_size[0]):
             for j in range(self.grid_size[1]):
-                if 0 < self.grid[i][j].value < 10 and not self.grid[i][j].hidden:
+                if 0 < self.grid[i][j].value < MINE and not self.grid[i][j].hidden:
                     color = colors.get(self.grid[i][j].value, "black")
                     self.ax.text(
                         j,
@@ -341,7 +455,7 @@ class Minesweeper:
                     )
                 elif self.grid[i][j].flagged:
                     self.ax.text(j, i, "⚑", ha="center", va="center", color="black")
-                elif self.grid[i][j].value == 100:
+                elif self.grid[i][j].is_mine() and not self.grid[i][j].hidden:
                     self.ax.text(j, i, "☠", ha="center", va="center", color="black")
 
         self.fig.canvas.draw_idle()
@@ -364,9 +478,9 @@ class Minesweeper:
         i, j = round(event.ydata), round(event.xdata)
 
         if self.is_valid_cell(i, j):
-            if event.button == 1:
+            if event.button == 1: # left click
                 self.reveal_cell(i, j)
-            elif event.button == 3:
+            elif event.button == 3: # right click
                 self.flag_cell(i, j)
             self.update_grid()
 
@@ -374,13 +488,28 @@ class Minesweeper:
         """
         Setup the buttons for the game
         """
-        button_positions = [0.1, 0.2, 0.3, 0.4]
+        button_width = self.grid_size[1] / 8
+        # start under the grid buttom left
+        buttun_start_x = self.grid_size[1] / 2 - 2 * button_width
+        button_positions = [
+            buttun_start_x,
+            buttun_start_x + button_width,
+            buttun_start_x + 2 * button_width,
+            buttun_start_x + 3 * button_width,
+        ]
         button_labels = ["Reset", "Hint", "Next", "Undo"]
         button_colors = ["green", "orange", "blue", "red"]
 
         self.buttons = []
         for pos, label, color in zip(button_positions, button_labels, button_colors):
-            ax = plt.axes([pos, 0.01, 0.1, 0.05])
+            ax = plt.axes(
+                [
+                    pos / self.grid_size[1] + BUTTONS_GAP,
+                    BUTTONS_Y,
+                    button_width / self.grid_size[1],
+                    0.05,
+                ]
+            )
             button = Button(ax, label, color=color, hovercolor="lightblue")
             button.label.set_fontsize("large")
             self.buttons.append(button)
@@ -395,7 +524,6 @@ class Minesweeper:
         Undo the last move
         """
         if self.last_visible_grid:
-            self.fig.set_facecolor("white")
             self.grid = copy.deepcopy(self.last_visible_grid)
             self.update_grid()
             self.fig.canvas.draw_idle()
@@ -408,7 +536,7 @@ class Minesweeper:
         next_visible_grid = rules.transition()
         for i in range(self.grid_size[0]):
             for j in range(self.grid_size[1]):
-                if next_visible_grid[i][j] == "X":
+                if next_visible_grid[i][j] == TO_BE_REVEALED:
                     self.grid[i][j].hidden = False
                 elif next_visible_grid[i][j] == "F":
                     self.grid[i][j].flagged = True
@@ -435,7 +563,7 @@ class Minesweeper:
         """
         Reset the game
         """
-        self.fig.set_facecolor("white")
+        self.fig.set_facecolor(BACKROUND_COLOR)
         self.grid = self.create_grid()
         self.visible_grid = copy.deepcopy(self.grid)
         self.last_visible_grid = None
@@ -516,7 +644,7 @@ class MinesweeperRules:
                 if mines_on_neighbors == int(self.visible_grid[ni][nj]):
                     for nni, nnj in self.get_neighborhood_indices(ni, nj):
                         if self.visible_grid[nni][nnj] == "_":
-                            next_grid[nni][nnj] = "X"
+                            next_grid[nni][nnj] = TO_BE_REVEALED
 
     def get_neighborhood(self, i, j):
         """
@@ -562,6 +690,6 @@ class MinesweeperRules:
 
 
 if __name__ == "__main__":
-    grid_size = (16, 30)
+    grid_size = (16, 16)
     game = Minesweeper(grid_size)
     game.run()
