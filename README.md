@@ -19,13 +19,16 @@ Both projects utilize basic Python libraries such as `NumPy` and `Matplotlib`, a
   - [Minesweeper Features](#minesweeper-features)
   - [Installation](#installation)
   - [Usage](#usage)
+  - [Gameplay Demo](#gameplay-demo)
   - [Gameplay Instructions](#gameplay-instructions)
+  - [How the Minesweeper Solver Works](#how-the-minesweeper-solver-works)
   - [Contributing](#contributing)
   - [Acknowledgements](#acknowledgements)
 - [CrossFinder](#crossfinder)
   - [Finder Features](#finder-features)
   - [How the CrossFinder Works](#how-the-crossfinder-works)
   - [How to Run the CrossFinder](#how-to-run-the-crossfinder)
+  - [Crossfinder Demo](#crossfinder-demo)
   - [CrossFinder GUI](#crossfinder-gui)
   - [Runing Examples](#runing-examples)
 - [License](#license)
@@ -99,22 +102,51 @@ A Python implementation of the classic Minesweeper game with a graphical user in
   - Next: Applies custom rules to reveal hidden cells.
   - Undo: Reverts the last move.
 
+### How the Minesweeper Solver Works
+
+The states of each cell are reduced to three categories: hidden, flagged, or revealed. The solver iterates over the visible grid, applies game rules, and reveals cells based on the rules. The solver uses a custom rule set inspired by Conway's Game of Life to reveal hidden cells.
+
+```mermaid
+graph TD
+  A[Start transition] --> B[Iterate over visible grid]
+  B --> C[Check if cell is not flagged or hidden]
+  C -->|Yes| D[Apply game rules]
+  D --> E[End transition]
+  C -->|No| F[Move to next cell]
+  F --> B
+  D --> G[Start apply_rules]
+  G --> H[Get neighboring cells]
+  H --> I[Calculate number of mines and hidden cells in neighborhood]
+  I --> J[Check if number of hidden cells and mines equals cell value]
+  J -->|Yes| K[Flag hidden cells]
+  K --> L[End apply_rules]
+  J -->|No| M[Check neighboring cells]
+  M --> N[Check if number of mines equals cell value]
+  N -->|Yes| O[Mark cells as safe]
+  O --> L
+  N -->|No| P[Move to next cell]
+  P --> M
+```
+
+> **Note**: The solver might wont be proceed without revealing more cells that might be mines.
+
 ### Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request with any improvements or bug fixes.
 
 Here are some ways you can contribute:
 
-- **Add new features to the game**: e.g., timer, high scores, custom grid sizes. Create a new game mode or difficulty level.
-
-- **GUI enhacements**: Implement additional buttons or functionalities to enhance the gameplay experience. Modified `matplotlib` default toolbar to include additional buttons for game controls.
-
-- **Algorithm improvements**: Optimize the game logic or implement new rules for revealing cells.
+| Enhancement Category | Description | Status |
+| --- | --- | --- |
+| Add new features to the game | e.g., timer, high scores, custom grid sizes. Create a new game mode or difficulty level. | Not Started |
+| GUI enhancements | Implement additional buttons or functionalities to enhance the gameplay experience. Modified `matplotlib` default toolbar to include additional buttons for game controls. | Not Started |
+| Algorithm improvements | Optimize the game logic or implement new rules for revealing cells. | Not Started |
+| Probabilistic solver | Develop a solver that uses probability to determine the best move. This is particularly useful in cases where no safe moves are available. This can be implemented using a Monte Carlo simulation or other probabilistic methods, such as Bayesian inference or Markov chains. | Not Started |
+| Image recognition solver | Create a solver that uses image recognition techniques to analyze game boards as an input image and determine the best move. This can be implemented using computer vision libraries such as `OpenCV` or `TensorFlow`. | Not Started |
 
 ### Acknowledgements
 
 - Inspired by the classic Minesweeper game from Microsoft Windows.
-
 - Built using [Matplotlib](https://matplotlib.org/) and [NumPy](https://numpy.org/).
 
 ---
