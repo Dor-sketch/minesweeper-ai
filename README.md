@@ -167,11 +167,7 @@ CrossFinder is an innovative variant of Conway's Game of Life, meticulously engi
 
 This ingenious program was conceived as a response to problem 28 in the seminal book **Biological Computation** by Ehud Lamm and Ron Unger. It was developed as a key component of the "Biological Computation" course at the Open University of Israel. The solution, amalgamated with another program ([simulationEarth](https://github.com/Dor-sketch/SimulationEarth)), was submitted and acclaimed with a perfect score of 100.
 
-<p align="center">
-  <img src="./images/cross_game.gif" alt="CrossFinder" width="860"/>
-    <p align="center">
-        <i>Algorithm identify target '+' shape</i>
-    </p>
+[Watch the video here](https://github.com/Dor-sketch/CrossFinder/assets/138825033/a8f0eb0a-88f0-44a2-ab0c-068b98fcabc6)
 
 ---
 
@@ -188,9 +184,10 @@ This ingenious program was conceived as a response to problem 28 in the seminal 
 ### How the CrossFinder Works
 
 <p align="center">
+  <img src="./images/cross_game.gif" alt="CrossFinder" width="500"/>
   <img src="./images/cross_game4.gif" alt="CrossFinder" width="500"/>
     <p align="center">
-        <i>Visualization of the CrossFinder simulation waves</i>
+        <i>Visualization of the CrossFinder simulation waves: Algorithm identify target '+' shape</i>
     </p>
 </p>
 
@@ -222,11 +219,6 @@ The program was tested on python `3.11` and requires the following packages:
   ```bash
   python3.11 cross_game.py
   ```
-
-### Crossfinder Demo
-
-[Watch the video here](https://github.com/Dor-sketch/CrossFinder/assets/138825033/acc9e89c-985e-46d6-8971-35d12319dff8)
-
 ---
 
 ### CrossFinder GUI
@@ -235,9 +227,11 @@ The program support both randomized initial states (press `reset` button) and us
 
 For the next generation, press `next Day` button.
 
-<p align="center">
-  <img src="./images/GUI.png" alt="GUI" width="500"/>
-</p>
+### Switching Modes
+
+Switch to conway's Game of Life from the Crossfinder and vise versa by simply clicking the `mode` button.
+
+[Watch the video here](https://github.com/Dor-sketch/CrossFinder/assets/138825033/23cc4323-4521-4140-8180-df5e279c40da)
 
 ### Runing Examples
 
