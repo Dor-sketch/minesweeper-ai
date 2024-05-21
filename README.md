@@ -70,8 +70,8 @@ A Python implementation of the classic Minesweeper game with a graphical user in
 
 2. **Install the required packages**:
 
-   ```bash
-   pip install -r requirements.txt
+    ```bash
+    pip install -r requirements.txt
     ```
 
 ### Usage
@@ -137,6 +137,8 @@ graph TD
 ```
 
 > **Note**: The solver might wont be proceed without revealing more cells that might be mines.
+
+---
 
 ### Contributing
 
@@ -209,17 +211,17 @@ The program was tested on python `3.11` and requires the following packages:
 
 ---
 
-Use the following command to run the program:
+- Use the following command to run the program:
 
-```bash
-    python3 cross_game.py
-```
+  ```bash
+  python3 cross_game.py
+  ```
 
-If more than one python version is installed, try use the following command:
+- If more than one python version is installed, try use the following command:
 
-```bash
-    python3.11 cross_game.py
-```
+  ```bash
+  python3.11 cross_game.py
+  ```
 
 ### Crossfinder Demo
 

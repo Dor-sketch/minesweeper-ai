@@ -13,7 +13,8 @@ import matplotlib.pyplot as plt
 from matplotlib import animation
 from matplotlib.widgets import Button
 from matplotlib.colors import ListedColormap
-from Rules import CrossRules, ConwayRules, get_neighberhood
+from crossfinder_rules import CrossRules, ConwayRules, get_neighberhood
+DEFAULT_GRID_SIZE = (32, 32)
 
 def track_changes(func):
     """
@@ -40,7 +41,7 @@ class GameOfLife:
     """
     A class to represent the custom game of life
     """
-    def __init__(self, grid_size):
+    def __init__(self, grid_size=DEFAULT_GRID_SIZE):
         self.grid_size = grid_size
         self.mode = "cross"
         self.grid = np.zeros(grid_size, dtype=np.int8)
@@ -301,3 +302,8 @@ class GameOfLife:
             save_count=20,
         )
         ani.save("cross_game.gif", writer="pillow")
+
+if __name__ == "__main__":
+    grid_size = (32, 32)
+    game = GameOfLife(grid_size)
+    game.run()

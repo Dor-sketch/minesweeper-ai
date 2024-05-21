@@ -2,6 +2,7 @@
 This file contains the configuration of the minesweeper game
 """
 
+DEFAULT_GRID_SIZE = (16, 16)
 FLAG_MINE = "F"
 MAYBE_MINE = "M"
 HIDDEN = "H"
