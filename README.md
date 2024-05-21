@@ -1,20 +1,26 @@
-# CrossFinder and Minesweeper Solver - Custom Game of Life Variants
+<div align="center">
+  <img src="./images/cover.png" alt="CrossFinder and Minesweeper Solver" width="860" style="display: block; margin-bottom: 0;"/>
+  <h1>Exploring Game Algorithms:<br>CrossFinder and Minesweeper AI</h1>
+</div>
 
-This repository contains two distinct Python Projects,Combining Cellular Automata with Game Development. The projects are as follows:
+---
 
-1. **CrossFinder**: An innovative variant of Conway's Game of Life, meticulously engineered to detect and manipulate cross shapes within a grid environment. Diverging from the conventional Game of Life, CrossFinder integrates additional states and tailor-made rules aimed at pinpointing and transforming cross-shaped patterns.
+This repository contains two distinct Python Projects, Combining Cellular Automata with Game Development. The projects are as follows:
+
+1. **CrossFinder**: An innovative variant of Conway's Game of Life, meticulously engineered to detect and manipulate cross shapes. Diverging from the conventional Game of Life, CrossFinder integrates additional states and tailor-made rules aimed at pinpointing and transforming cross-shaped patterns.
 
 2. **Minesweeper**: A Python implementation of the classic Minesweeper game with a graphical user interface (GUI) using `Matplotlib` and `NumPy`. This project includes additional features like reset, hint, next, and undo buttons.
 
 Both projects utilize basic Python libraries such as `NumPy` and `Matplotlib`, and are designed to run in a local environment. Enjoy exploring these projects and feel free to contribute to their development!
 
-## Table of Contents
+---
 
-<!-- @import "[TOC]" {cmd="toc" depthFrom=2 depthTo=3 orderedList=false} -->
+**Table of Contents**
+
+<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
 
 <!-- code_chunk_output -->
 
-- [Table of Contents](#table-of-contents)
 - [Minesweeper](#minesweeper)
   - [Minesweeper Features](#minesweeper-features)
   - [Installation](#installation)
@@ -22,18 +28,24 @@ Both projects utilize basic Python libraries such as `NumPy` and `Matplotlib`, a
   - [Gameplay Demo](#gameplay-demo)
   - [Gameplay Instructions](#gameplay-instructions)
   - [How the Minesweeper Solver Works](#how-the-minesweeper-solver-works)
-  - [Contributing](#contributing)
-  - [Acknowledgements](#acknowledgements)
 - [CrossFinder](#crossfinder)
   - [Finder Features](#finder-features)
   - [How the CrossFinder Works](#how-the-crossfinder-works)
+    - [Rules Overview](#rules-overview)
   - [How to Run the CrossFinder](#how-to-run-the-crossfinder)
-  - [Crossfinder Demo](#crossfinder-demo)
   - [CrossFinder GUI](#crossfinder-gui)
-  - [Runing Examples](#runing-examples)
+  - [Switching Modes](#switching-modes)
+  - [Running Examples](#running-examples)
+    - [Example 1](#example-1)
+    - [Example 2](#example-2)
+    - [Example 3](#example-3)
+- [Contributing](#contributing)
+- [Acknowledgements](#acknowledgements)
 - [License](#license)
 
 <!-- /code_chunk_output -->
+
+
 
 ---
 
@@ -42,7 +54,7 @@ Both projects utilize basic Python libraries such as `NumPy` and `Matplotlib`, a
 A Python implementation of the classic Minesweeper game with a graphical user interface (GUI) using Matplotlib and NumPy. This project includes additional features like reset, hint, next, and undo buttons.
 
 <p align="center">
-  <i>Minesweeper Game Retro GUI</i>
+  <i>Minesweeper Retro GUI with Dynamic Game Layout Support.</i>
   <br>
   <img src="./images/mines_grad.png" alt="Minesweeper" width="860"/>
 </p>
@@ -140,27 +152,6 @@ graph TD
 
 ---
 
-### Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request with any improvements or bug fixes.
-
-Here are some ways you can contribute:
-
-| Enhancement Category | Description | Status |
-| --- | --- | --- |
-| Add new features to the game | e.g., timer, high scores, custom grid sizes. Create a new game mode or difficulty level. | Not Started |
-| GUI enhancements | Implement additional buttons or functionalities to enhance the gameplay experience. Modified `matplotlib` default toolbar to include additional buttons for game controls. | Not Started |
-| Algorithm improvements | Optimize the game logic or implement new rules for revealing cells. | Not Started |
-| Probabilistic solver | Develop a solver that uses probability to determine the best move. This is particularly useful in cases where no safe moves are available. This can be implemented using a Monte Carlo simulation or other probabilistic methods, such as Bayesian inference or Markov chains. | Not Started |
-| Image recognition solver | Create a solver that uses image recognition techniques to analyze game boards as an input image and determine the best move. This can be implemented using computer vision libraries such as `OpenCV` or `TensorFlow`. | Not Started |
-
-### Acknowledgements
-
-- Inspired by the classic Minesweeper game from Microsoft Windows.
-- Built using [Matplotlib](https://matplotlib.org/) and [NumPy](https://numpy.org/).
-
----
-
 ## CrossFinder
 
 CrossFinder is an innovative variant of Conway's Game of Life, meticulously engineered to detect and manipulate cross shapes within a grid environment. Diverging from the conventional Game of Life, CrossFinder integrates additional states and tailor-made rules aimed at pinpointing and transforming cross-shaped patterns.
@@ -203,7 +194,6 @@ The CrossFinder program operates on a grid where cells can transition between st
 The program was tested on python `3.11` and requires the following packages:
 
 - `numpy`: For grid manipulation and operations
-
 - `matplotlib`: For visualization
 
 ---
@@ -219,6 +209,7 @@ The program was tested on python `3.11` and requires the following packages:
   ```bash
   python3.11 cross_game.py
   ```
+
 ---
 
 ### CrossFinder GUI
@@ -229,11 +220,11 @@ For the next generation, press `next Day` button.
 
 ### Switching Modes
 
-Switch to conway's Game of Life from the Crossfinder and vise versa by simply clicking the `mode` button.
+Switch to conway's Game of Life from the CrossFinder and vise versa by simply clicking the `mode` button.
 
 [Watch the video here](https://github.com/Dor-sketch/CrossFinder/assets/138825033/23cc4323-4521-4140-8180-df5e279c40da)
 
-### Runing Examples
+### Running Examples
 
 #### Example 1
 
@@ -255,7 +246,7 @@ Initial state - 2nd example: 2 valid crosses in different sizes
 
 #### Example 3
 
-Complex destruction exmp - no valid crosses
+Complex destruction example - no valid crosses
 
 | 1 | 2 | 3 | 4 |
 | - | - | - | - |
@@ -270,6 +261,25 @@ Complex destruction exmp - no valid crosses
 | ![Alt text](./images/image-11.png) | ![Alt text](./images/image-12.png) | ![Alt text](./images/image-13.png) | ![Alt text](./images/image-14.png) |
 
 ---
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request with any improvements or bug fixes.
+
+Here are some ways you can contribute to the Minesweeper:
+
+| Enhancement Category | Description | Status |
+| --- | --- | --- |
+| Add new features to the game | e.g., timer, high scores, custom grid sizes. Create a new game mode or difficulty level. | Not Started |
+| GUI enhancements | Implement additional buttons or functionalities to enhance the gameplay experience. Modified `matplotlib` default toolbar to include additional buttons for game controls. | Not Started |
+| Algorithm improvements | Optimize the game logic or implement new rules for revealing cells. | Not Started |
+| Probabilistic solver | Develop a solver that uses probability to determine the best move. This is particularly useful in cases where no safe moves are available. This can be implemented using a Monte Carlo simulation or other probabilistic methods, such as Bayesian inference or Markov chains. | Not Started |
+| Image recognition solver | Create a solver that uses image recognition techniques to analyze game boards as an input image and determine the best move. This can be implemented using computer vision libraries such as `OpenCV` or `TensorFlow`. | Not Started |
+
+## Acknowledgements
+
+- Inspired by the classic Minesweeper game from Microsoft Windows.
+- Built using [Matplotlib](https://matplotlib.org/) and [NumPy](https://numpy.org/).
 
 ## License
 

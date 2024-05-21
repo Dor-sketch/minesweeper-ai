@@ -14,7 +14,10 @@ from matplotlib import animation
 from matplotlib.widgets import Button
 from matplotlib.colors import ListedColormap
 from crossfinder_rules import CrossRules, ConwayRules, get_neighberhood
+from utils import generate_background
+
 DEFAULT_GRID_SIZE = (32, 32)
+FIGURE_SIZE = (16, 10)
 
 def track_changes(func):
     """
@@ -48,6 +51,9 @@ class GameOfLife:
         self.changed_indices = []
         self.create_grid(grid_size)
         self.fig, self.ax = plt.subplots()
+        self.fig.set_size_inches(FIGURE_SIZE[0], FIGURE_SIZE[1])
+        generate_background(self.fig, self.grid)
+
         self.init_grid()
         # plt.subplots_adjust(bottom=0.2)
         self.cmap = ListedColormap(
@@ -150,7 +156,7 @@ class GameOfLife:
         window_center = self.ax.transAxes.inverted().transform(window_center_display)
 
         # Calculate the button positions in axes coordinates
-        button_width = 0.2
+        button_width = 0.13
         button_height = 0.05
         button_positions = [
             (window_center[0] - 1.5 * button_width, 0.01),
@@ -161,7 +167,7 @@ class GameOfLife:
         # Create buttons
         self.buttons = []
         for i, pos in enumerate(button_positions):
-            ax = plt.axes([pos[0], pos[1], button_width, button_height])
+            ax = plt.axes([pos[0] - 0.05, pos[1], button_width, button_height])
             button = Button(ax, ["Clear", "Next Day", "Reset", "Mode"][i], color=['red', 'green', 'yellow', 'cyan'][i], hovercolor='blue')
             button.label.set_fontsize('large')
             self.buttons.append(button)
@@ -171,8 +177,10 @@ class GameOfLife:
         self.buttons[1].on_clicked(self.next_day)
         self.buttons[2].on_clicked(self.reset)
         self.buttons[3].on_clicked(self.change_mode)
-
     def change_mode(self, event):
+        """
+        Change the mode of the game from cross to conway and vice versa
+        """
         if self.mode == "cross":
             self.mode = "conway"
             self.buttons[3].label.set_text("Mode: Conway")
@@ -186,7 +194,12 @@ class GameOfLife:
         if (event.xdata is None) or (event.ydata is None):
             print("clicked outside the grid")
             return
-        i, j = int(event.ydata), int(event.xdata)
+
+        # check if clicked on a button
+        for button in self.buttons:
+            if button.ax.get_window_extent().contains(event.x, event.y):
+                return
+        i, j = round(event.ydata), round(event.xdata)
         if i == 0 and j == 0:
             # BUG: There is a bug here, the first cell is connected to the buttons
             print("clicked on the axes")
@@ -268,14 +281,6 @@ class GameOfLife:
     def run(self):
         self.fig.canvas.mpl_connect("button_press_event", self.on_click)
         plt.show()
-        ani = animation.FuncAnimation(
-            self.fig,
-            self.update_grid,
-            interval=1000,
-            blit=True,
-            repeat=False,
-            save_count=10,
-        )
 
     def generateGif(self):
         fig = plt.figure()
