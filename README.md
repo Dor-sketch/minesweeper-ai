@@ -42,7 +42,7 @@ Both projects utilize basic Python libraries such as `NumPy` and `Matplotlib`, a
 A Python implementation of the classic Minesweeper game with a graphical user interface (GUI) using Matplotlib and NumPy. This project includes additional features like reset, hint, next, and undo buttons.
 
 <p align="center">
-  <i>Minesweeper Game Retro GUI
+  <i>Minesweeper Game Retro GUI</i>
   <br>
   <img src="./images/mines_grad.png" alt="Minesweeper" width="860"/>
 </p>
