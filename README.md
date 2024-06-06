@@ -11,7 +11,14 @@ This repository contains two distinct Python Projects, Combining Cellular Automa
 
 2. **Minesweeper**: A Python implementation of the classic Minesweeper game with a graphical user interface (GUI) using `Matplotlib` and `NumPy`. This project includes additional features like reset, hint, next, and undo buttons.
 
-Both projects utilize basic Python libraries such as `NumPy` and `Matplotlib`, and are designed to run in a local environment. Enjoy exploring these projects and feel free to contribute to their development!
+> Both projects utilize basic Python libraries such as NumPy and Matplotlib, and were originally designed to run in a local environment.
+>
+> **Note**: The projects can now be run via the browser. For more information, please visit the [Git Pages for this repository.](https://Dor-sketch.github.io/CrossFinder)
+
+[![GitHub license](https://img.shields.io/github/license/Dor-sketch/CrossFinder)](https://github.com/Dor-sketch/CrossFinder/blob/main/LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/Dor-sketch/CrossFinder)](https://github.com/Dor-sketch/CrossFinder/issues)
+[![GitHub stars](https://img.shields.io/github/stars/Dor-sketch/CrossFinder)](https://github.com/Dor-sketch/CrossFinder/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/Dor-sketch/CrossFinder)](https://github.com/Dor-sketch/CrossFinder/network/members)
 
 ---
 
