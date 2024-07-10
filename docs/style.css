@@ -45,19 +45,15 @@ main {
 
 
 .badges {
-    text-align: center;
-    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1.25rem;
 }
 .badges img {
     margin: 0 10px;
 }
-.section {
-    background: #fff;
-    margin-bottom: 20px;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
+
 .section img {
     width: 80%;
     max-width: 860px;
@@ -183,7 +179,7 @@ main {
 .section {
     background: #fff;
     margin-bottom: 20px;
-    padding: 2rem;
+    padding: 1rem;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
