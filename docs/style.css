@@ -33,6 +33,7 @@ main, .container {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow adjusted to match darker theme */
     border-radius: 8px;
     text-align: left;
+    width: 100%;
     margin: 1rem 0;
     max-width: calc(min(90%, 800px));
     color: var(--quaternary-color); /* Using gray for text to reduce harshness */
