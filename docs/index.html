@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-T7HFKFX0PR"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-T7HFKFX0PR');
+    </script>
+    <!-- End Google tag (gtag.js) -->
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minesweeper AI</title>
+    <meta name="description"
+        content="A Python implementation of the classic Minesweeper game with a graphical user interface (GUI) using Matplotlib and NumPy. This project includes additional features like reset, hint, next, and undo buttons.">
+    <meta name="keywords"
+        content="Minesweeper, Minesweeper AI, Minesweeper Solver, Minesweeper Game, Minesweeper Python, Minesweeper GUI, Minesweeper Matplotlib, Minesweeper NumPy">
+    <meta name="author" content="Dor Pascal">
+    <meta name="robots" content="index, follow">
+    <meta name="revisit-after" content="3 months">
+    <meta name="language" content="en">
+    <meta name="generator" content="Visual Studio Code">
+    <meta name="distribution" content="global">
+    <meta name="rating" content="general">
+    <meta property="og:title" content="Minesweeper AI">
+    <meta property="og:description"
+        content="A Python implementation of the classic Minesweeper game with a graphical user interface (GUI) using Matplotlib and NumPy. This project includes additional features like reset, hint, next, and undo buttons.">
+    <meta property="og:url" content="https://dorpascal.com/minesweeper-ai">
+    <meta property="og:site_name" content="Minesweeper AI">
+    <meta property="og:locale" content="he_IL">
+    <meta property="og:type" content="website">
+    <meta property="og:locale:alternate" content="en_US">
+    <meta property="og:locale:alternate" content="ar_IL">
+    <meta property="og:image" content="https://dorpascal.com/15-puzzle/images/cover.gif">
+    <meta name="theme-color" content="#003300">
+    <link rel="icon" href="https://dorpascal.com/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="https://dorpascal.com/favicon.ico">
+    <link rel="canonical" href="https://dorpascal.com/minesweeper-ai">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.0.0/mermaid.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.0.0/mermaid.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="./images/cover.png" alt="CrossFinder and Minesweeper Solver">
+            <h1>Exploring Game Algorithms:<br>CrossFinder and Minesweeper AI</h1>
+        </div>
+
+        <div class="badges">
+            <a href="https://github.com/Dor-sketch/CrossFinder/blob/main/LICENSE"><img
+                    src="https://img.shields.io/github/license/Dor-sketch/CrossFinder" alt="GitHub license"></a>
+            <a href="https://github.com/Dor-sketch/CrossFinder/issues"><img
+                    src="https://img.shields.io/github/issues/Dor-sketch/CrossFinder" alt="GitHub issues"></a>
+            <a href="https://github.com/Dor-sketch/CrossFinder/stargazers"><img
+                    src="https://img.shields.io/github/stars/Dor-sketch/CrossFinder" alt="GitHub stars"></a>
+            <a href="https://github.com/Dor-sketch/CrossFinder/network/members"><img
+                    src="https://img.shields.io/github/forks/Dor-sketch/CrossFinder" alt="GitHub forks"></a>
+        </div>
+    <div class="container">
+        <h2>App Demo</h2>
+        <iframe src="app.html" title="App Demo"></iframe>
+    </div>
+        <div class="section">
+            <p>This repository contains two distinct Python Projects, Combining Cellular Automata with Game Development.
+                The projects are as follows:</p>
+            <ol>
+                <li><strong>CrossFinder</strong>: An innovative variant of Conway's Game of Life, meticulously
+                    engineered to detect and manipulate cross shapes. Diverging from the conventional Game of Life,
+                    CrossFinder integrates additional states and tailor-made rules aimed at pinpointing and transforming
+                    cross-shaped patterns.</li>
+                <li><strong>Minesweeper</strong>: A Python implementation of the classic Minesweeper game with a
+                    graphical user interface (GUI) using <code>Matplotlib</code> and <code>NumPy</code>. This project
+                    includes additional features like reset, hint, next, and undo buttons.</li>
+            </ol>
+            <p>Both projects utilize basic Python libraries such as NumPy and Matplotlib, and were originally designed
+                to run in a local environment.</p>
+            <p><strong>Note</strong>: The projects can now be run via the browser. For more information, please visit
+                the <a href="https://Dor-sketch.github.io/CrossFinder">Git Pages for this repository</a>.</p>
+        </div>
+
+        <div class="section toc">
+            <h2>Table of Contents</h2>
+            <ul>
+                <li><a href="#minesweeper">Minesweeper</a></li>
+                <li><a href="#minesweeper-features">Minesweeper Features</a></li>
+                <li><a href="#installation">Installation</a></li>
+                <li><a href="#usage">Usage</a></li>
+                <li><a href="#gameplay-demo">Gameplay Demo</a></li>
+                <li><a href="#gameplay-instructions">Gameplay Instructions</a></li>
+                <li><a href="#how-the-minesweeper-solver-works">How the Minesweeper Solver Works</a></li>
+                <li><a href="#crossfinder">CrossFinder</a></li>
+                <li><a href="#finder-features">Finder Features</a></li>
+                <li><a href="#how-the-crossfinder-works">How the CrossFinder Works</a></li>
+                <li><a href="#rules-overview">Rules Overview</a></li>
+                <li><a href="#how-to-run-the-crossfinder">How to Run the CrossFinder</a></li>
+                <li><a href="#crossfinder-gui">CrossFinder GUI</a></li>
+                <li><a href="#switching-modes">Switching Modes</a></li>
+                <li><a href="#running-examples">Running Examples</a></li>
+                <li><a href="#contributing">Contributing</a></li>
+                <li><a href="#acknowledgements">Acknowledgements</a></li>
+                <li><a href="#license">License</a></li>
+            </ul>
+        </div>
+
+        <div class="section" id="minesweeper">
+            <h2>Minesweeper</h2>
+            <p>A Python implementation of the classic Minesweeper game with a graphical user interface (GUI) using
+                Matplotlib and NumPy. This project includes additional features like reset, hint, next, and undo
+                buttons.</p>
+            <img src="./images/mines_grad.png" alt="Minesweeper">
+        </div>
+
+        <div class="section" id="minesweeper-features">
+            <h3>Minesweeper Features</h3>
+            <ul>
+                <li><strong>Classic Minesweeper Gameplay</strong>: Inspired by the original Minesweeper game from
+                    Microsoft Windows.</li>
+                <li><strong>Graphical User Interface (GUI)</strong>: Built with Matplotlib for visual interaction.</li>
+                <li><strong>Interactive Buttons</strong>:
+                    <ul>
+                        <li><strong>Reset Button</strong>: Resets the game.</li>
+                        <li><strong>Hint Button</strong>: Reveals a random hidden cell.</li>
+                        <li><strong>Next Button</strong>: Applies a custom rule set inspired by Conway's Game of Life to
+                            reveal hidden cells.</li>
+                        <li><strong>Undo Button</strong>: Undoes the last move.</li>
+                    </ul>
+                </li>
+                <li><strong>Custom Rules</strong>: Implements custom rules for the "Next" button to provide an enhanced
+                    gameplay experience.</li>
+                <li><strong>Game Over and Win Conditions</strong>: Game ends when a mine is hit or all non-mine cells
+                    are revealed.</li>
+            </ul>
+        </div>
+
+        <div class="section" id="installation">
+            <h3>Installation</h3>
+            <ol>
+                <li><strong>Clone the repository</strong>:
+                    <div class="code-block">
+                        <pre>git clone https://github.com/Dor-sketch/CrossFinder
+cd CrossFinder</pre>
+                    </div>
+                </li>
+                <li><strong>Install the required packages</strong>:
+                    <div class="code-block">
+                        <pre>pip install -r requirements.txt</pre>
+                    </div>
+                </li>
+            </ol>
+        </div>
+
+        <div class="section" id="usage">
+            <h3>Usage</h3>
+            <ol>
+                <li><strong>Run the Minesweeper game</strong>:
+                    <div class="code-block">
+                        <pre>python3 mines.py</pre>
+                    </div>
+                </li>
+                <li><strong>Play the game using the GUI</strong>:
+                    <ul>
+                        <li>Left-click to reveal a cell.</li>
+                        <li>Right-click to flag a cell as a mine.</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+
+        <div class="section" id="gameplay-demo">
+            <h3>Gameplay Demo</h3>
+            <p><a
+                    href="https://github.com/Dor-sketch/CrossFinder/assets/138825033/0b47e63a-9fa8-4b1f-b0a9-17ac5f92b7f7">Watch
+                    the video here</a></p>
+        </div>
+
+        <div class="section" id="gameplay-instructions">
+            <h3>Gameplay Instructions</h3>
+            <p><strong>Objective</strong>: Reveal all non-mine cells without hitting a mine.</p>
+            <p><strong>Cells</strong>:</p>
+            <ul>
+                <li>Hidden Cell: A cell that has not been revealed.</li>
+                <li>Revealed Cell: A cell that has been revealed, showing either a number or a mine.</li>
+                <li>Flagged Cell: A cell flagged as a potential mine.</li>
+            </ul>
+            <p><strong>Buttons</strong>:</p>
+            <ul>
+                <li>Reset: Starts a new game.</li>
+                <li>Hint: Reveals a random hidden cell.</li>
+                <li>Next: Applies custom rules to reveal hidden cells.</li>
+                <li>Undo: Reverts the last move.</li>
+            </ul>
+            <img src="./images/skull.png" alt="Minesweeper Gameplay">
+        </div>
+
+        <div class="section" id="how-the-minesweeper-solver-works">
+            <h3>How the Minesweeper Solver Works</h3>
+            <p>The states of each cell are reduced to three categories: hidden, flagged, or revealed. The solver
+                iterates over the visible grid, applies game rules, and reveals cells based on the rules. The solver
+                uses a custom rule set inspired by Conway's Game of Life to reveal hidden cells.</p>
+            <div class="mermaid">
+                graph TD
+                A[Start transition] --> B[Iterate over visible grid]
+                B --> C[Check if cell is not flagged or hidden]
+                C -->|Yes| D[Apply game rules]
+                D --> E[End transition]
+                C -->|No| F[Move to next cell]
+                F --> B
+                D --> G[Start apply_rules]
+                G --> H[Get neighboring cells]
+                H --> I[Calculate number of mines and hidden cells in neighborhood]
+                I --> J[Check if number of hidden cells and mines equals cell value]
+                J -->|Yes| K[Flag hidden cells]
+                K --> L[End apply_rules]
+                J -->|No| M[Check neighboring cells]
+                M --> N[Check if number of mines equals cell value]
+                N -->|Yes| O[Mark cells as safe]
+                O --> L
+                N -->|No| P[Move to next cell]
+                P --> M
+            </div>
+            <p><strong>Note</strong>: The solver might not proceed without revealing more cells that might be mines.</p>
+        </div>
+
+        <div class="section" id="crossfinder">
+            <h2>CrossFinder</h2>
+            <p>CrossFinder is an innovative variant of Conway's Game of Life, meticulously engineered to detect and
+                manipulate cross shapes within a grid environment. Diverging from the conventional Game of Life,
+                CrossFinder integrates additional states and tailor-made rules aimed at pinpointing and transforming
+                cross-shaped patterns.</p>
+            <p>This ingenious program was conceived as a response to problem 28 in the seminal book <strong>Biological
+                    Computation</strong> by Ehud Lamm and Ron Unger. It was developed as a key component of the
+                "Biological Computation" course at the Open University of Israel. The solution, amalgamated with another
+                program (<a href="https://github.com/Dor-sketch/SimulationEarth">simulationEarth</a>), was submitted and
+                acclaimed with a perfect score of 100.</p>
+            <p><a
+                    href="https://github.com/Dor-sketch/CrossFinder/assets/138825033/a8f0eb0a-88f0-44a2-ab0c-068b98fcabc6">Watch
+                    the video here</a></p>
+        </div>
+
+        <div class="section" id="finder-features">
+            <h3>Finder Features</h3>
+            <ul>
+                <li>Grid-based simulation where each cell can be in one of four states:
+                    <ul>
+                        <li><code>0</code>: Dead</li>
+                        <li><code>1</code>: Alive</li>
+                        <li><code>2</code>: Red, marking cells that are part of a cross or interact with cross shapes
+                        </li>
+                        <li><code>3</code>: Blue, indicating the propagation of a wave from the edges of a cross towards
+                            its center</li>
+                    </ul>
+                </li>
+                <li>Custom rules to detect and highlight cross shapes within the grid</li>
+                <li>Functionality to visualize the detection and processing of crosses in real-time</li>
+            </ul>
+        </div>
+
+        <div class="section" id="how-the-crossfinder-works">
+            <h3>How the CrossFinder Works</h3>
+            <p>The CrossFinder program operates on a grid where cells can transition between states based on their
+                neighbors. The primary focus is on identifying and marking cross shapes. A cross is defined as a
+                vertical and horizontal line intersecting at a central cell, all of which are alive (<code>1</code>).
+                When a cross is detected, the cells constituting the cross transition to the state <code>2</code> (red),
+                signifying the first wave of detection.</p>
+            <img src="./images/cross_game.gif" alt="CrossFinder">
+            <img src="./images/cross_game4.gif" alt="CrossFinder">
+            <p><i>Visualization of the CrossFinder simulation waves: Algorithm identify target '+' shape</i></p>
+        </div>
+
+        <div class="section" id="rules-overview">
+            <h4>Rules Overview</h4>
+            <ul>
+                <li>The first wave (<code>2</code> state) targets cells that form the cross structure. When a pattern
+                    matching a part of the cross is found, those cells transition to the red state.</li>
+                <li>The second wave (<code>3</code> state) begins at the edges of the cross and moves towards the
+                    center, marking the progression of the detection process.</li>
+            </ul>
+        </div>
+        <div class="section" id="how-the-crossfinder-works">
+            <h3>How the CrossFinder Works</h3>
+            <p>The CrossFinder program operates on a grid where cells can transition between states based on their
+                neighbors. The primary focus is on identifying and marking cross shapes. A cross is defined as a
+                vertical and horizontal line intersecting at a central cell, all of which are alive (<code>1</code>).
+                When a cross is detected, the cells constituting the cross transition to the state <code>2</code> (red),
+                signifying the first wave of detection.</p>
+            <img src="./images/cross_game.gif" alt="CrossFinder">
+            <img src="./images/cross_game4.gif" alt="CrossFinder">
+            <p><i>Visualization of the CrossFinder simulation waves: Algorithm identify target '+' shape</i></p>
+        </div>
+
+        <div class="section" id="rules-overview">
+            <h4>Rules Overview</h4>
+            <ul>
+                <li>The first wave (<code>2</code> state) targets cells that form the cross structure. When a pattern
+                    matching a part of the cross is found, those cells transition to the red state.</li>
+                <li>The second wave (<code>3</code> state) begins at the edges of the cross and moves towards the
+                    center, marking the progression of the detection process.</li>
+            </ul>
+        </div>
+
+        <div class="section" id="how-to-run-the-crossfinder">
+            <h4>How to Run the CrossFinder</h4>
+            <p>The program was tested on python <code>3.11</code> and requires the following packages:</p>
+            <ul>
+                <li><code>numpy</code>: For grid manipulation and operations</li>
+                <li><code>matplotlib</code>: For visualization</li>
+            </ul>
+            <p>Use the following command to run the program:</p>
+            <div class="code-block">
+                <pre>python3 cross_game.py</pre>
+            </div>
+            <p>If more than one python version is installed, try using the following command:</p>
+            <div class="code-block">
+                <pre>python3.11 cross_game.py</pre>
+            </div>
+        </div>
+
+        <div class="section" id="crossfinder-gui">
+            <h4>CrossFinder GUI</h4>
+            <p>The program supports both randomized initial states (press <code>reset</code> button) and user
+                interactive controls (press the matrix cells to change their state).</p>
+            <p>For the next generation, press <code>next Day</code> button.</p>
+        </div>
+
+        <div class="section" id="switching-modes">
+            <h4>Switching Modes</h4>
+            <p>Switch to Conway's Game of Life from the CrossFinder and vice versa by simply clicking the
+                <code>mode</code> button.
+            </p>
+            <p><a
+                    href="https://github.com/Dor-sketch/CrossFinder/assets/138825033/23cc4323-4521-4140-8180-df5e279c40da">Watch
+                    the video here</a></p>
+        </div>
+
+        <div class="section" id="running-examples">
+            <h4>Running Examples</h4>
+            <h5>Example 1</h5>
+            <table>
+                <tr>
+                    <th>Initial state</th>
+                    <th>2</th>
+                    <th>3</th>
+                    <th>4</th>
+                    <th>Finale state</th>
+                </tr>
+                <tr>
+                    <td><img src="./images/Screenshot 2024-01-01 at 20.13.23.png" alt="Example 1"></td>
+                    <td><img src="./images/Screenshot 2024-01-01 at 20.13.32.png" alt="Example 1"></td>
+                    <td><img src="./images/Screenshot 2024-01-01 at 20.13.40.png" alt="Example 1"></td>
+                    <td><img src="./images/Screenshot 2024-01-01 at 20.13.49.png" alt="Example 1"></td>
+                    <td><img src="./images/Screenshot 2024-01-01 at 20.14.04.png" alt="Example 1"></td>
+                </tr>
+            </table>
+            <h5>Example 2</h5>
+            <p>Initial state - 2nd example: 2 valid crosses in different sizes</p>
+            <table>
+                <tr>
+                    <th>Initial state</th>
+                    <th>2</th>
+                    <th>3</th>
+                    <th>Finale state</th>
+                </tr>
+                <tr>
+                    <td><img src="./images/Screenshot 2024-01-01 at 20.12.37.png" alt="Example 2"></td>
+                    <td><img src="./images/Screenshot 2024-01-01 at 20.12.53.png" alt="Example 2"></td>
+                    <td><img src="./images/Screenshot 2024-01-01 at 20.13.03.png" alt="Example 2"></td>
+                    <td><img src="./images/Screenshot 2024-01-01 at 20.13.10.png" alt="Example 2"></td>
+                </tr>
+            </table>
+            <h5>Example 3</h5>
+            <p>Complex destruction example - no valid crosses</p>
+            <table>
+                <tr>
+                    <th>1</th>
+                    <th>2</th>
+                    <th>3</th>
+                    <th>4</th>
+                </tr>
+                <tr>
+                    <td><img src="./images/image-2.png" alt="Example 3"></td>
+                    <td><img src="./images/image-3.png" alt="Example 3"></td>
+                    <td><img src="./images/image-4.png" alt="Example 3"></td>
+                    <td><img src="./images/image-5.png" alt="Example 3"></td>
+                </tr>
+                <tr>
+                    <th>5</th>
+                    <th>6</th>
+                    <th>7</th>
+                    <th>8</th>
+                </tr>
+                <tr>
+                    <td><img src="./images/image-6.png" alt="Example 3"></td>
+                    <td><img src="./images/image-8.png" alt="Example 3"></td>
+                    <td><img src="./images/image-9.png" alt="Example 3"></td>
+                    <td><img src="./images/image-10.png" alt="Example 3"></td>
+                </tr>
+                <tr>
+                    <th>10</th>
+                    <th>11</th>
+                    <th>12</th>
+                    <th>Finale state</th>
+                </tr>
+                <tr>
+                    <td><img src="./images/image-11.png" alt="Example 3"></td>
+                    <td><img src="./images/image-12.png" alt="Example 3"></td>
+                    <td><img src="./images/image-13.png" alt="Example 3"></td>
+                    <td><img src="./images/image-14.png" alt="Example 3"></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section" id="contributing">
+            <h2>Contributing</h2>
+            <p>Contributions are welcome! Please open an issue or submit a pull request with any improvements or bug
+                fixes.</p>
+            <p>Here are some ways you can contribute to the Minesweeper:</p>
+            <table id="contributionTable">
+                <tr>
+                    <th>Enhancement Category</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                </tr>
+                <tr class="contributionRow">
+                    <td>Add new features to the game</td>
+                    <td>e.g., timer, high scores, custom grid sizes. Create a new game mode or difficulty level.</td>
+                    <td class="status">Not Started</td>
+                </tr>
+                <tr class="contributionRow">
+                    <td>GUI enhancements</td>
+                    <td>Implement additional buttons or functionalities to enhance the gameplay experience. Modified
+                        <code>matplotlib</code> default toolbar to include additional buttons for game controls.
+                    </td>
+                    <td class="status">Not Started</td>
+                </tr>
+                <tr class="contributionRow">
+                    <td>Algorithm improvements</td>
+                    <td>Optimize the game logic or implement new rules for revealing cells.</td>
+                    <td class="status">Not Started</td>
+
+                </tr>
+                <tr class="contributionRow">
+                    <td>Probabilistic solver</td>
+                    <td>Develop a solver that uses probability to determine the best move. This is particularly useful
+                        in cases where no safe moves are available. This can be implemented using a Monte Carlo
+                        simulation or other probabilistic methods, such as Bayesian inference or Markov chains.</td>
+                    <td class="status">Not Started</td>
+
+                </tr>
+                <tr class="contributionRow">
+                    <td>Image recognition solver</td>
+                    <td>Create a solver that uses image recognition techniques to analyze game boards as an input image
+                        and determine the best move. This can be implemented using computer vision libraries such as
+                        <code>OpenCV</code> or <code>TensorFlow</code>.
+                    </td>
+                    <td class="status">Not Started</td>
+
+                </tr>
+            </table>
+        </div>
+
+        <div class="section" id="acknowledgements">
+            <h2>Acknowledgements</h2>
+            <ul>
+                <li>Inspired by the classic Minesweeper game from Microsoft Windows.</li>
+                <li>Built using <a href="https://matplotlib.org/">Matplotlib</a> and <a
+                        href="https://numpy.org/">NumPy</a>.</li>
+            </ul>
+        </div>
+
+        <div class="section" id="license">
+            <h2>License</h2>
+            <p>This project is licensed under the MIT License - see the <a href="./LICENSE">LICENSE</a> file for
+                details.</p>
+        </div>
+    </div>
+    <script>
+            mermaid.initialize({ startOnLoad: true });
+    hljs.highlightAll();
+        document.addEventListener('DOMContentLoaded', () => {
+            mermaid.initialize({ startOnLoad: true });
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            var rows = document.querySelectorAll('.contributionRow');
+            rows.forEach(function (row) {
+                row.addEventListener('click', function () {
+                    var status = row.querySelector('.status');
+                    if (status.textContent === 'Not Started') {
+                        status.textContent = 'In Progress';
+                        status.style.color = 'orange'; // Optional: Change color to indicate progress
+                    } else if (status.textContent === 'In Progress') {
+                        status.textContent = 'Completed';
+                        status.style.color = 'green'; // Optional: Change color to indicate completion
+                    } else {
+                        status.textContent = 'Not Started';
+                        status.style.color = 'red'; // Optional: Reset to default color
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

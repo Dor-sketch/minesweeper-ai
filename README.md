@@ -1,10 +1,10 @@
 <div align="center">
-  <img src="./images/cover.png" alt="CrossFinder and Minesweeper Solver" width="860" style="display: block; margin-bottom: 0;"/>
+  <img src="./docs/images/cover.png" alt="CrossFinder and Minesweeper Solver" width="860" style="display: block; margin-bottom: 0;"/>
   <h1>Exploring Game Algorithms:<br>CrossFinder and Minesweeper AI</h1>
 </div>
 
 ---
-
+![alt text](image.png)
 This repository contains two distinct Python Projects, Combining Cellular Automata with Game Development. The projects are as follows:
 
 1. **CrossFinder**: An innovative variant of Conway's Game of Life, meticulously engineered to detect and manipulate cross shapes. Diverging from the conventional Game of Life, CrossFinder integrates additional states and tailor-made rules aimed at pinpointing and transforming cross-shaped patterns.
@@ -31,10 +31,6 @@ This repository contains two distinct Python Projects, Combining Cellular Automa
 - [Minesweeper](#minesweeper)
   - [Minesweeper Features](#minesweeper-features)
   - [Installation](#installation)
-  - [Usage](#usage)
-  - [Gameplay Demo](#gameplay-demo)
-  - [Gameplay Instructions](#gameplay-instructions)
-  - [How the Minesweeper Solver Works](#how-the-minesweeper-solver-works)
 - [CrossFinder](#crossfinder)
   - [Finder Features](#finder-features)
   - [How the CrossFinder Works](#how-the-crossfinder-works)
@@ -63,7 +59,7 @@ A Python implementation of the classic Minesweeper game with a graphical user in
 <p align="center">
   <i>Minesweeper Retro GUI with Dynamic Game Layout Support.</i>
   <br>
-  <img src="./images/mines_grad.png" alt="Minesweeper" width="860"/>
+  <img src="./docs/images/mines_grad.png" alt="Minesweeper" width="860"/>
 </p>
 
 ### Minesweeper Features
@@ -126,7 +122,7 @@ A Python implementation of the classic Minesweeper game with a graphical user in
 <p align="center">
   <i>Skulls indicate mines in the game</i>
   <br>
-  <img src="./images/skull.png" alt="Minesweeper Gameplay" width="860"/>
+  <img src="./docs/images/skull.png" alt="Minesweeper Gameplay" width="860"/>
 </p>
 
 ### How the Minesweeper Solver Works
@@ -182,8 +178,8 @@ This ingenious program was conceived as a response to problem 28 in the seminal 
 ### How the CrossFinder Works
 
 <p align="center">
-  <img src="./images/cross_game.gif" alt="CrossFinder" width="500"/>
-  <img src="./images/cross_game4.gif" alt="CrossFinder" width="500"/>
+  <img src="./docs/images/cross_game.gif" alt="CrossFinder" width="500"/>
+  <img src="./docs/images/cross_game4.gif" alt="CrossFinder" width="500"/>
     <p align="center">
         <i>Visualization of the CrossFinder simulation waves: Algorithm identify target '+' shape</i>
     </p>
@@ -237,7 +233,7 @@ Switch to conway's Game of Life from the CrossFinder and vise versa by simply cl
 
 | Initial state | 2 | 3 | 4 | *Finale state* |
 | - | - | - | - | - |
-| ![Alt text](<./images/Screenshot 2024-01-01 at 20.13.23.png>) | ![Alt text](<./images/Screenshot 2024-01-01 at 20.13.32.png>) | ![Alt text](<./images/Screenshot 2024-01-01 at 20.13.40.png>) | ![Alt text](<./images/Screenshot 2024-01-01 at 20.13.49.png>) | ![Alt text](<./images/Screenshot 2024-01-01 at 20.14.04.png>) |
+| ![Alt text](<./docs/images/Screenshot 2024-01-01 at 20.13.23.png>) | ![Alt text](<./docs/images/Screenshot 2024-01-01 at 20.13.32.png>) | ![Alt text](<./docs/images/Screenshot 2024-01-01 at 20.13.40.png>) | ![Alt text](<./docs/images/Screenshot 2024-01-01 at 20.13.49.png>) | ![Alt text](<./docs/images/Screenshot 2024-01-01 at 20.14.04.png>) |
 
 ---
 
@@ -247,7 +243,7 @@ Initial state - 2nd example: 2 valid crosses in different sizes
 
 | Initial state | 2 | 3 | *Finale state* |
 | - | - | - | - |
-| ![Alt text](<./images/Screenshot 2024-01-01 at 20.12.37.png>) | ![Alt text](<./images/Screenshot 2024-01-01 at 20.12.53.png>) | ![Alt text](<./images/Screenshot 2024-01-01 at 20.13.03.png>) | ![Alt text](<./images/Screenshot 2024-01-01 at 20.13.10.png>) |
+| ![Alt text](<./docs/images/Screenshot 2024-01-01 at 20.12.37.png>) | ![Alt text](<./docs/images/Screenshot 2024-01-01 at 20.12.53.png>) | ![Alt text](<./docs/images/Screenshot 2024-01-01 at 20.13.03.png>) | ![Alt text](<./docs/images/Screenshot 2024-01-01 at 20.13.10.png>) |
 
 ---
 
@@ -257,15 +253,15 @@ Complex destruction example - no valid crosses
 
 | 1 | 2 | 3 | 4 |
 | - | - | - | - |
-| ![Alt text](<./images/image-2.png>) | ![Alt text](<./images/image-3.png>) | ![Alt text](<./images/image-4.png>) | ![Alt text](<./images/image-5.png>) |
+| ![Alt text](<./docs/images/image-2.png>) | ![Alt text](<./docs/images/image-3.png>) | ![Alt text](<./docs/images/image-4.png>) | ![Alt text](<./docs/images/image-5.png>) |
 
 | 5 | 6 | 7 | 8 |
 | - | - | - | - |
-| ![Alt text](./images/image-6.png) |![Alt text](./images/image-8.png) | ![Alt text](./images/image-9.png) | ![Alt text](./images/image-10.png) |
+| ![Alt text](./docs/images/image-6.png) |![Alt text](./docs/images/image-8.png) | ![Alt text](./docs/images/image-9.png) | ![Alt text](./docs/images/image-10.png) |
 
 |  10 | 11 | 12 | *Finale state* |
 | - | - | - | - |
-| ![Alt text](./images/image-11.png) | ![Alt text](./images/image-12.png) | ![Alt text](./images/image-13.png) | ![Alt text](./images/image-14.png) |
+| ![Alt text](./docs/images/image-11.png) | ![Alt text](./docs/images/image-12.png) | ![Alt text](./docs/images/image-13.png) | ![Alt text](./docs/images/image-14.png) |
 
 ---
 

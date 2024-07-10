@@ -1,0 +1,130 @@
+:root {
+    --primary-color: #4CAF50; /* A more subdued green for primary actions */
+    --secondary-color: #1B5E20; /* A darker green for backgrounds */
+    --tertiary-color: #F1F8E9; /* A light green for container backgrounds */
+    --quaternary-color: #757575; /* A neutral gray for less important elements */
+}
+
+body {
+    font-family: 'Courier New', monospace;
+    background-color: #212121; /* Keeping the dark background for contrast */
+    color: var(--primary-color);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+}
+
+header {
+    background-color: var(--secondary-color);
+    color: var(--tertiary-color);
+    width: 100%;
+    padding: 1rem 0;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Adjusted for better visibility */
+}
+
+main, .container {
+    padding: 2rem;
+    background: var(--tertiary-color); /* Lighter background for content areas */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow adjusted to match darker theme */
+    border-radius: 8px;
+    text-align: left;
+    width: 100%;
+    margin: 1rem 0;
+    max-width: calc(min(90%, 800px));
+    color: var(--quaternary-color); /* Using gray for text to reduce harshness */
+}
+main {
+    animation: fadeIn 2s ease-in-out;
+}
+.header {
+    text-align: center;
+    padding: 50px 0;
+}
+.header img {
+    width: 100%;
+    max-width: 860px;
+    margin-bottom: 20px;
+}
+.header h1 {
+    font-size: 2.5em;
+    margin: 0;
+}
+.badges {
+    text-align: center;
+    margin: 20px 0;
+}
+.badges img {
+    margin: 0 10px;
+}
+.section {
+    background: #fff;
+    margin-bottom: 20px;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.section img {
+    width: 100%;
+    max-width: 860px;
+    display: block;
+    margin: 20px auto;
+}
+.toc {
+    margin: 20px 0;
+}
+.toc ul {
+    padding-left: 20px;
+}
+.toc li {
+    margin: 10px 0;
+}
+.code-block {
+    background: #eee;
+    padding: 10px;
+    border-radius: 4px;
+    overflow-x: auto;
+}
+.code-block pre {
+    margin: 0;
+}
+.contributionRow:hover {
+    cursor: pointer;
+    background-color: #f0f0f0;
+}
+.status {
+    color: red;
+    /* Initial color for 'Not Started' */
+}
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 2em;
+    }
+}
+.code-block pre {
+    margin: 0;
+    background: #282c34;
+    color: #abb2bf;
+    padding: 20px;
+    border-radius: 5px;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+    .image-center img {
+            display: block;
+            margin: 0 auto;
+        }
+
+        iframe {
+            width: 100%;
+            max-width: 800px;
+            aspect-ratio: 944/560;
+        }

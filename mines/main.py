@@ -87,8 +87,8 @@ CELL_SIZE = min(
 GRID_SIZE = DEFAULT_GRID_SIZE
 
 # Font settings
-FONT_SIZE = CELL_SIZE * 2 // 3  # Set the font size to half the cell size
-FONT = pygame.font.SysFont("monospace", FONT_SIZE, bold=True)
+FONT_SIZE = CELL_SIZE * 2 // 3 # Set the font size to half the cell size
+FONT = pygame.font.Font("Roboto-Regular.ttf", FONT_SIZE)
 
 RUNING = True
 
@@ -693,9 +693,9 @@ class Minesweeper:
         global RUNING
         while RUNING:
             if self.end:
-                text = FONT.render("Game Over!\nRestart or Undo", True, RED)
+                text = FONT.render("Game Over! Restart or Undo", antialias=True, color=(255, 0, 0, 255), bgcolor=(255, 255, 255, 255), wraplength=WINDOW_SIZE[0] - 100)
                 text_rect = text.get_rect(
-                    center=(WINDOW_SIZE[0] // 2, WINDOW_SIZE[1] // 2 + 50))
+                    center=(WINDOW_SIZE[0] // 2 - 100, WINDOW_SIZE[1] // 2 + 50))
                 screen.blit(text, text_rect)
             if self.grid_dirty and not self.end:
                 await self.draw_grid()  # Draw the grid only when necessary
