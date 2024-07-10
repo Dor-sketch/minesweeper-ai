@@ -1,13 +1,13 @@
 :root {
-    --primary-color: #4CAF50; /* A more subdued green for primary actions */
-    --secondary-color: #1B5E20; /* A darker green for backgrounds */
-    --tertiary-color: #F1F8E9; /* A light green for container backgrounds */
-    --quaternary-color: #757575; /* A neutral gray for less important elements */
+    --primary-color: #000080; /* Classic Windows blue for primary actions */
+    --secondary-color: #C0C0C0; /* Light gray for backgrounds, reminiscent of window backgrounds */
+    --tertiary-color: #A0A0A0; /* A darker shade of gray for container backgrounds */
+    --quaternary-color: #000000; /* Black for text and less important elements */
 }
 
 body {
     font-family: 'Courier New', monospace;
-    background-color: #212121; /* Keeping the dark background for contrast */
+    background-color: #a79d9d; /* Keeping the dark background for contrast */
     color: var(--primary-color);
     margin: 0;
     padding: 0;
@@ -19,7 +19,7 @@ body {
 }
 
 header {
-    background-color: var(--secondary-color);
+    background-color: var(--primary-color);
     color: var(--tertiary-color);
     width: 100%;
     padding: 1rem 0;
@@ -28,7 +28,7 @@ header {
 }
 
 main, .container {
-    padding: 2rem;
+    padding: 1rem;
     background: var(--tertiary-color); /* Lighter background for content areas */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow adjusted to match darker theme */
     border-radius: 8px;
@@ -37,6 +37,134 @@ main, .container {
     margin: 1rem 0;
     max-width: calc(min(90%, 800px));
     color: var(--quaternary-color); /* Using gray for text to reduce harshness */
+    overflow-x: hidden;
+}
+main {
+    animation: fadeIn 2s ease-in-out;
+}
+
+
+.badges {
+    text-align: center;
+    margin: 20px 0;
+}
+.badges img {
+    margin: 0 10px;
+}
+.section {
+    background: #fff;
+    margin-bottom: 20px;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.section img {
+    width: 80%;
+    max-width: 860px;
+    display: block;
+    margin: 20px auto;
+}
+.toc {
+    margin: 20px 0;
+}
+.toc ul {
+    padding-left: 20px;
+}
+.toc li {
+    margin: 10px 0;
+}
+
+.contributionRow:hover {
+    cursor: pointer;
+    background-color: #f0f0f0;
+}
+.status {
+    color: red;
+    /* Initial color for 'Not Started' */
+}
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 2em;
+    }
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+.image-center img {
+    display: block;
+    margin: 0 auto;
+}
+
+
+h1 {
+    font-size: 2em;
+    margin: 0.67em 0;
+}
+
+h2 {
+    font-size: 1.5em;
+    margin: 0.83em 0;
+}
+
+h3 {
+    font-size: 1.17em;
+    margin: 1em 0;
+}
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.5em;
+    }
+    h2 {
+        font-size: 1.17em;
+    }
+    h3 {
+        font-size: 1em;
+    }
+}
+
+#app-demo {
+    background-color: rgb(249, 249, 249);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+footer {
+    background-color: var(--secondary-color);
+    color: var(--tertiary-color);
+    width: 100%;
+    padding: 1rem 0;
+    text-align: center;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3); /* Adjusted for better visibility */
+}
+
+body {
+    font-family: 'Courier New', monospace;
+    background-color: #a79d9d; /* Keeping the dark background for contrast */
+    color: var(--primary-color);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+}
+
+
+
+main, .container {
+    padding: 1rem;
+    background: var(--tertiary-color); /* Lighter background for content areas */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow adjusted to match darker theme */
+    border-radius: 8px;
+    text-align: left;
+    width: 100%;
+    margin: 1rem 0;
+    max-width: calc(min(90%, 800px));
+    color: var(--quaternary-color); /* Using gray for text to reduce harshness */
+overflow-x: hidden;
 }
 main {
     animation: fadeIn 2s ease-in-out;
@@ -72,7 +200,7 @@ main {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 .section img {
-    width: 100%;
+    width: 80%;
     max-width: 860px;
     display: block;
     margin: 20px auto;
@@ -101,19 +229,66 @@ main {
     }
 }
 
-
 img {
     max-width: 100%;
     height: auto;
 }
+.image-center img {
+    display: block;
+    margin: 0 auto;
+}
+iframe {
+    width: 100%;
+    max-width: 944px;
+    aspect-ratio: 1.6871;
+    border: none;
+    outline: none;
+}
 
-    .image-center img {
-            display: block;
-            margin: 0 auto;
-        }
+h1 {
+    font-size: 2em;
+    margin: 0.67em 0;
+}
 
-        iframe {
-            width: 100%;
-            max-width: 800px;
-            aspect-ratio: 944/560;
-        }
+h2 {
+    font-size: 1.5em;
+    margin: 0.83em 0;
+}
+
+h3 {
+    font-size: 1.17em;
+    margin: 1em 0;
+}
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.5em;
+    }
+    h2 {
+        font-size: 1.17em;
+    }
+    h3 {
+        font-size: 1em;
+    }
+}
+
+#app-demo {
+background-color: rgb(255, 255, 255);
+width: 100%;
+display: flex;
+justify-content: center;
+padding-bottom: 0.5rem;
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+footer {
+    background-color: var(--secondary-color);
+    color: var(--quaternary-color);
+    width: 100%;
+    padding: 1rem 0;
+    text-align: center;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3); /* Adjusted for better visibility */
+}
+footer a {
+    color: var(--primary-color);
+}

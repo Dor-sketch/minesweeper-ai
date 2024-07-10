@@ -286,8 +286,8 @@ config = {
         }
 
         div.emscripten { text-align: center; }
-        div.emscripten_border { border: 1px solid black; }
-        div.thick_border { border: 4px solid black; }
+        div.emscripten_border { border: 0px solid black; }
+        div.thick_border { border: 0px solid black; }
 
         /* the canvas *must not* have any border or padding, or mouse coords will be wrong */
         /* average size of droid screen 470dp x 320dp  */
@@ -306,6 +306,8 @@ config = {
             bottom: 0;
             left: 0;
             right: 0;
+            outline: none;
+            border: 0px solid black;
         }
 
         body {
@@ -336,14 +338,14 @@ config = {
         .trinfo{
            position:relative;
            right:0px;
-           border: 1px solid black;
+           border: 0px solid black;
         }
 
         .framed{
            position:relative;
            top:150px;
            right:10px;
-           border: 1px solid black;
+           border: 0px solid black;
         }
     </style>
 
@@ -400,8 +402,8 @@ height="1px"
 width="470px" height="90%"
 allowtransparency="true"
 style="z-index: 10;"
-style="background: #FFFFFF;"
-frameborder="1"
+style="background: #FFFFFF; border: 0px solid black; outline: none;"
+frameborder="0"
                 allowfullscreen="true"
                 webkitallowfullscreen="true"
                 msallowfullscreen="true"
