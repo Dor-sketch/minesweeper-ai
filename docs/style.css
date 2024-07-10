@@ -1,13 +1,13 @@
 :root {
-    --primary-color: #000080; /* Classic Windows blue for primary actions */
-    --secondary-color: #C0C0C0; /* Light gray for backgrounds, reminiscent of window backgrounds */
-    --tertiary-color: #A0A0A0; /* A darker shade of gray for container backgrounds */
-    --quaternary-color: #000000; /* Black for text and less important elements */
+    --primary-color: #1d421e; /* A more subdued green for primary actions */
+    --secondary-color: #1B5E20; /* A darker green for backgrounds */
+    --tertiary-color: #F1F8E9; /* A light green for container backgrounds */
+    --quaternary-color: #232323; /* A neutral gray for less important elements */
 }
 
 body {
     font-family: 'Courier New', monospace;
-    background-color: #a79d9d; /* Keeping the dark background for contrast */
+    background-color: #cccccc; /* Keeping the dark background for contrast */
     color: var(--primary-color);
     margin: 0;
     padding: 0;
@@ -101,11 +101,13 @@ img {
 h1 {
     font-size: 2em;
     margin: 0.67em 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Added text shadow for better visibility */
 }
 
 h2 {
     font-size: 1.5em;
     margin: 0.83em 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Added text shadow for better visibility */
 }
 
 h3 {
@@ -138,20 +140,6 @@ footer {
     text-align: center;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3); /* Adjusted for better visibility */
 }
-
-body {
-    font-family: 'Courier New', monospace;
-    background-color: #a79d9d; /* Keeping the dark background for contrast */
-    color: var(--primary-color);
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    overflow-x: hidden;
-}
-
 
 
 main, .container {
@@ -277,18 +265,18 @@ background-color: rgb(255, 255, 255);
 width: 100%;
 display: flex;
 justify-content: center;
-padding-bottom: 0.5rem;
 box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+margin-bottom: 1rem;
 }
 
 footer {
-    background-color: var(--secondary-color);
-    color: var(--quaternary-color);
+    background-color: var(--primary-color);
+    color: var(--tertiary-color);
     width: 100%;
     padding: 1rem 0;
     text-align: center;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3); /* Adjusted for better visibility */
 }
 footer a {
-    color: var(--primary-color);
+    color: var(--tertiary-color);
 }
